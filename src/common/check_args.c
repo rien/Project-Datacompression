@@ -36,5 +36,6 @@ arguments parse_arguments(int argc, char **argv) {
     if(!result.destination){
         graceful_exit("Could not open file to writing: %s\n", argv[3]);
     }
+
     return result;
 }
