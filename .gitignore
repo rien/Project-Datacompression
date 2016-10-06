@@ -32,6 +32,7 @@
 *.dylib
 
 # Executables
+out/
 *.exe
 *.out
 *.app
@@ -117,7 +118,6 @@ acs-*.bib
 # cprotect
 *.cpt
 
-# fixme
 *.lox
 
 #(r)(e)ledmac/(r)(e)ledpar
