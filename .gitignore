@@ -1,4 +1,7 @@
 
+# Testfiles
+*.json
+
 # Created by https://www.gitignore.io/api/c,cmake
 
 ### CLion ###
