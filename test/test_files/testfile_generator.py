@@ -4,8 +4,7 @@ import random
 sizes = {'1K'   : 1000,
          '1M'   : 1000000,
          '10M'  : 10000000,
-         '100M' : 100000000,
-         '1G'   : 1000000000}
+         '100M' : 100000000}
 
 for k, v in sizes.items():
     file = open(k + '.json', 'w')

@@ -22,6 +22,8 @@ typedef struct {
     option_type option;
 } arguments;
 
-arguments parse_arguments(int argc, char* argv[]);
+void graceful_exit_printf(const char *msg,...);
+
+void parse_arguments(arguments* args, int argc, char* argv[]);
 
 #endif //DA3_PROJECT_CHECK_ARGS_H

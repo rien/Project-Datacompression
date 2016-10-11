@@ -6,36 +6,37 @@
 #include <string.h>
 #include "check_args.h"
 
-void graceful_exit(const char *msg, ...) {
-    printf(msg);
+extern arguments args;
+
+void graceful_exit_printf(const char *msg,...) {
+    printf(msg); //expand varargs
     printf("Usage: %s {-d|-c} source destination\n", program_name);
+    // close files, doesn't matter if they are open or not
+    fclose(args.source);
+    fclose(args.destination);
     exit(1);
 }
 
-arguments parse_arguments(int argc, char **argv) {
-    arguments result;
+void parse_arguments(arguments* args, int argc, char **argv) {
 
     // first argument is the name of the executable
     if(argc != (ARG_COUNT + 1)) {
-        graceful_exit("Expected %i arguments, but got %i\n", ARG_COUNT, argc - 1);
+        graceful_exit_printf("Expected %i arguments, but got %i\n", ARG_COUNT, argc - 1);
     } else if (strcmp(argv[1],"-c") == 0){
-        result.option = COMPRESS;
+        args->option = COMPRESS;
     } else if (strcmp(argv[1], "-d") == 0){
-        result.option = DECOMPRESS;
+        args->option = DECOMPRESS;
     } else {
-        graceful_exit("Argument %s not recognised\n", argv[1]);
+        graceful_exit_printf("Argument %s not recognised\n", argv[1]);
     }
 
-    result.source = fopen(argv[2], "r");
-    result.destination = fopen(argv[3], "w");
-
-    // fopen returns NULL on error
-    if(!result.source){
-        graceful_exit("Could not read file: %s\n", argv[2]);
+    // open files and check if everything is ok
+    args->source = fopen(argv[2],"r");
+    if(args->source == NULL){
+        graceful_exit_printf("Could not open file for reading: %s", args->source);
     }
-    if(!result.destination){
-        graceful_exit("Could not open file to writing: %s\n", argv[3]);
+    args->destination = fopen(argv[3], "w");
+    if(args->destination == NULL){
+        graceful_exit_printf("Could not open file for writing: %s", args->destination);
     }
-
-    return result;
 }

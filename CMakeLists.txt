@@ -3,9 +3,9 @@ project(DA3_project)
 
 set(CMAKE_C_FLAGS "-std=c99 -lm -Wall")
 
-add_executable(standaard src/standaard/main.c src/common/check_args.c src/common/check_args.h)
+add_executable(standaard src/standaard/main.c src/common/check_args.c src/common/check_args.h src/standaard/encoder.c src/standaard/encoder.h src/common/constanst.h)
 
-add_executable(specifiek src/specifiek/main.c src/common/check_args.c src/common/check_args.h)
+add_executable(specifiek src/specifiek/main.c src/common/check_args.c src/common/check_args.h src/common/constanst.h)
 
 add_executable(test_standaard test/test_standaard/main.c)
 add_executable(test_specifiek test/test_specifiek/main.c)
