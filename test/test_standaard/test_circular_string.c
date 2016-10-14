@@ -22,25 +22,21 @@ void test_get(){
     circular_string c_str = get_c_str(str);
 
 
-    test_assert("First character should be H", circular_string_get(&c_str, 0) == 'H');
+    test_assert("First character should be H", circular_string_first(&c_str) == 'H');
     test_assert("Second character should be a", circular_string_get(&c_str, 1) == 'a');
     test_assert("Not circular", circular_string_get(&c_str, c_str.length) == 'H');
 
     c_str.offset = 6;
-    test_assert("First character should be t", circular_string_get(&c_str, 0) == 't');
+    test_assert("First character should be t", circular_string_first(&c_str) == 't');
     test_assert("Second character should be e", circular_string_get(&c_str, 1) == 'e');
     test_assert("Not circular", circular_string_get(&c_str, c_str.length - 6) == 'H');
 }
 
-void test_set_last(){
+void test_get_last(){
     char* str = "Hallo test string.";
     circular_string c_str = get_c_str(str);
 
-    circular_string_set_last(&c_str);
-    test_assert("Expected '.'", circular_string_first(&c_str) == '.');
-
-    circular_string_set_last(&c_str);
-    test_assert("Expected 'g'", circular_string_first(&c_str) == 'g');
+    test_assert("Expected '.'", circular_string_last(&c_str) == '.');
 }
 
 void  test_compare() {
@@ -79,6 +75,6 @@ void  test_compare() {
 
 void test_circular_string() {
     test_get();
-    test_set_last();
+    test_get_last();
     test_compare();
 }

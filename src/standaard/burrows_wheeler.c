@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include "burrows_wheeler.h"
 
-void burrows_wheeler_encode(char block[], size_t length, circular_string t_rows[], size_t* start_pos) {
+void burrows_wheeler_encode(char block[], size_t length, char output[], size_t* start_pos) {
+
+    circular_string* t_rows =malloc(sizeof(circular_string)*length);
 
     for (size_t i = 0; i < length; ++i) {
         t_rows[i].base = block;
@@ -15,12 +17,14 @@ void burrows_wheeler_encode(char block[], size_t length, circular_string t_rows[
 
     qsort(t_rows, length, sizeof(circular_string), circular_string_compare);
 
-    // set to last row and remember the starting position
+    // write the last row to the output
     for (size_t i = 0; i < length; ++i) {
-        circular_string_set_last(&t_rows[i]);
+        output[i] = circular_string_last(&t_rows[i]);
         if (t_rows[i].offset == 0) {
             *start_pos = i;
         }
     }
+
+    free(t_rows);
 }
 

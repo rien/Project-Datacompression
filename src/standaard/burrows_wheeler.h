@@ -10,8 +10,8 @@
 /*
  * Transform a block of BLOCK_SIZE characters with the burrows wheeler transformation
  */
-void burrows_wheeler_encode(char block[], size_t length, circular_string t_rows[], size_t* start_pos);
+void burrows_wheeler_encode(char block[], size_t length, char output[], size_t* start_pos);
 
-void burrows_wheeler_decode();
+void burrows_wheeler_decode(char block[], size_t length, char output[], size_t start_pos);
 
 #endif //DA3_PROJECT_BURROWS_WHEELER_H

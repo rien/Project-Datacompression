@@ -16,4 +16,16 @@ void test_move_to_front(){
     move_to_front_encode(test, buffer, length);
     move_to_front_decode(buffer, result, length);
     test_assert("Move to front does not decode or encode correctly", strcmp(test, result) == 0);
+    free(buffer);
+    free(result);
+
+    char* test2 = "Deze\0\125string bevat\0 \255rare karakters!";
+    size_t length2 = 36;
+    buffer = calloc(length2+1, sizeof(char));
+    result = calloc(length2+1, sizeof(char));
+    move_to_front_encode(test2, buffer, length2);
+    move_to_front_decode(buffer, result, length2);
+    for (size_t i = 0; i < length2; ++i) {
+        test_assert("Move to front with weird chars",test2[i] == result[i]);
+    }
 }

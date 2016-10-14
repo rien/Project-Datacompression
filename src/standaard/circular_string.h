@@ -17,7 +17,9 @@ char circular_string_get(const circular_string* cstr, size_t index);
 
 char circular_string_first(const circular_string* cstr);
 
-void circular_string_set_last(circular_string* cstr);
+char circular_string_last(const circular_string *cstr);
+
+void circular_string_array_to_string(const circular_string cstr[], char* output, size_t length);
 
 int circular_string_compare(const void* a, const void* b);
 

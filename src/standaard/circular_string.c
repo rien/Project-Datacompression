@@ -27,7 +27,6 @@ int circular_string_compare(const void* a, const void* b) {
     return diff;
 }
 
-void circular_string_set_last(circular_string* cstr) {
-    cstr->offset += cstr->length - 1;
-    cstr->offset %= cstr->length;
+char circular_string_last(const circular_string *cstr) {
+    return circular_string_get(cstr, cstr->length-1);
 }
