@@ -12,7 +12,7 @@
 int encode() {
 
     char buffer[BLOCK_SIZE];
-    circular_string matrix[BLOCK_SIZE];
+    char matrix[BLOCK_SIZE];
     size_t a_read;  // amount of bytes read
     size_t t_start; // starting position of the transformed string
     while((a_read = fread(buffer, BLOCK_SIZE, sizeof(char), args.source)) > 0){

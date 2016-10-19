@@ -7,7 +7,7 @@
 
 void burrows_wheeler_encode(char block[], size_t length, char output[], size_t* start_pos) {
 
-    circular_string* t_rows =malloc(sizeof(circular_string)*length);
+    circular_string t_rows[length];
 
     for (size_t i = 0; i < length; ++i) {
         t_rows[i].base = block;
@@ -24,7 +24,5 @@ void burrows_wheeler_encode(char block[], size_t length, char output[], size_t* 
             *start_pos = i;
         }
     }
-
-    free(t_rows);
 }
 
