@@ -29,21 +29,24 @@ typedef struct huffman_node {
 
 typedef struct {
     huffman_codeword codes[256];
+    huffman_node leaves[256];
     size_t size;
     huffman_node* root;
 } huffman_dictionary;
 
-huffman_dictionary* huffman_init_dictionary();
+void huffman_init_dictionary(huffman_dictionary* hd);
 
-huffman_dictionary* huffman_build_dictionary(uchar input[], size_t length);
+void huffman_build_tree(uchar input[], size_t length, huffman_dictionary* hd);
 
-void huffman_dictionary_free(huffman_dictionary* dict);
+void huffman_build_dictionary(huffman_dictionary* hd);
+
+void huffman_dictionary_free(huffman_dictionary* hd);
 
 void huffman_tree_free(huffman_node* root);
 
-uchar* huffman_encode(uchar input[], size_t length, size_t* output_length, huffman_node* tree);
+uchar* huffman_encode(uchar input[], size_t length, size_t* output_length, huffman_dictionary* tree);
 
-uchar* huffman_decode(uchar input[], size_t length, size_t* output_length, huffman_node* tree);
+uchar* huffman_decode(uchar input[], size_t length, size_t* output_length, huffman_dictionary* tree);
 
 
 #endif //DA3_PROJECT_HUFFMAN_H
