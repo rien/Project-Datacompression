@@ -33,7 +33,9 @@ typedef struct {
     huffman_node* root;
 } huffman_dictionary;
 
-huffman_node* huffman_build_tree(uchar input[], size_t length);
+huffman_dictionary* huffman_init_dictionary();
+
+huffman_dictionary* huffman_build_dictionary(uchar input[], size_t length);
 
 void huffman_dictionary_free(huffman_dictionary* dict);
 
