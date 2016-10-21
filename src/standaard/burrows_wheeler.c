@@ -4,8 +4,9 @@
 
 #include <stdlib.h>
 #include "burrows_wheeler.h"
+#include "../common/uchar.h"
 
-void burrows_wheeler_encode(char block[], size_t length, char output[], size_t* start_pos) {
+void burrows_wheeler_encode(uchar block[], size_t length, uchar output[], size_t* start_pos) {
 
     circular_string t_rows[length];
 

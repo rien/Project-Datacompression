@@ -25,12 +25,12 @@ uchar move_to_front(uchar c, uchar *table){
 
 void init_table(uchar *table){
     for (size_t i = 0; i < TABLE_SIZE; ++i) {
-        table[i] = (char)i;
+        table[i] = (uchar)i;
     }
 }
 
 
-void move_to_front_encode(char *input, char *output, size_t length) {
+void move_to_front_encode(uchar *input, uchar *output, size_t length) {
     uchar table[TABLE_SIZE];
     init_table(table);
     for (size_t i = 0; i < length; ++i ) {
@@ -38,7 +38,7 @@ void move_to_front_encode(char *input, char *output, size_t length) {
     }
 }
 
-void move_to_front_decode(char *input, char *output, size_t length) {
+void move_to_front_decode(uchar *input, uchar *output, size_t length) {
     uchar table[TABLE_SIZE];
     init_table(table);
     for (size_t i = 0; i < length; ++i) {

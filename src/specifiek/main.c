@@ -8,6 +8,6 @@ char* program_name = "specifiek";
 arguments args;
 
 int main(int argc, char* argv[]) {
-    args = parse_arguments(argc, argv);
+    parse_arguments(&args, argc, argv);
     return 0;
 }

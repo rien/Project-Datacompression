@@ -6,12 +6,12 @@
 #include "circular_string.h"
 #include "stdio.h"
 
-char circular_string_get(const circular_string* cstr, size_t index) {
+uchar circular_string_get(const circular_string* cstr, size_t index) {
     size_t position = (cstr->offset + index) % cstr->length;
     return cstr->base[position];
 }
 
-char circular_string_first(const circular_string *cstr) {
+uchar circular_string_first(const circular_string *cstr) {
     return circular_string_get(cstr, 0);
 }
 
@@ -27,6 +27,6 @@ int circular_string_compare(const void* a, const void* b) {
     return diff;
 }
 
-char circular_string_last(const circular_string *cstr) {
+uchar circular_string_last(const circular_string *cstr) {
     return circular_string_get(cstr, cstr->length-1);
 }

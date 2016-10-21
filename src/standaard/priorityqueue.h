@@ -6,26 +6,25 @@
 #define DA3_PROJECT_PRIORITYQUEUE_H
 
 #include <stddef.h>
+#include "huffman.h"
+
+#define PQ_TYPE huffman_node
+#define PQ_MAX_SIZE 256
+#define PQ_INIT {.size = 0}
 
 typedef struct {
-    void* items;
+    PQ_TYPE* items[PQ_MAX_SIZE];
     size_t size;
-    size_t max_size;
-    int (*comparator)(const void*,const void*);
 } priorityqueue;
 
-priorityqueue* pq_allocate(size_t max_size, int (*comparator)(const void*,const void*));
+void pq_insert(PQ_TYPE* item, priorityqueue* pq);
 
-void pq_insert(void* item, priorityqueue* pq);
+void pq_quick_insert(PQ_TYPE* item, priorityqueue* pq);
 
-void pq_insert_witouth_sorting(void* item, priorityqueue* pq);
+void pq_sort(priorityqueue* pq);
 
-void pq_fix_sorting(priorityqueue* pq);
+PQ_TYPE* pq_peek_last(priorityqueue* pq);
 
-void* pq_peek(priorityqueue* pq);
-
-void* pq_remove(priorityqueue* pq);
-
-void pq_free(priorityqueue* pq);
+PQ_TYPE* pq_remove_last(priorityqueue* pq);
 
 #endif //DA3_PROJECT_PRIORITYQUEUE_H

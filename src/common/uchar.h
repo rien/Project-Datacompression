@@ -13,6 +13,7 @@
 
 typedef unsigned char uchar;
 
-#define UCHAR(str) (uchar)(str)
+#define UCHAR(chr) (uchar)(chr)
+#define UCHAR_PTR(str) (uchar*)(str)
 
 #endif //DA3_PROJECT_UCHAR_H

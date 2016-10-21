@@ -9,16 +9,16 @@
 #include "../test_common/testmacro.h"
 
 
-circular_string get_c_str(char* base){
+circular_string get_c_str(uchar* base){
     circular_string c_str;
     c_str.base = base;
-    c_str.length = strlen(base);
+    c_str.length = strlen((char*)base);
     c_str.offset = 0;
     return c_str;
 }
 
 void test_get(){
-    char* str = "Hallo test string.";
+    uchar* str = UCHAR_PTR("Hallo test string.");
     circular_string c_str = get_c_str(str);
 
 
@@ -33,14 +33,14 @@ void test_get(){
 }
 
 void test_get_last(){
-    char* str = "Hallo test string.";
+    uchar* str = UCHAR_PTR("Hallo test string.");
     circular_string c_str = get_c_str(str);
 
     test_assert("Expected '.'", circular_string_last(&c_str) == '.');
 }
 
 void  test_compare() {
-    char* test  = "aaabc\0\0\0\0";
+    uchar* test  = UCHAR_PTR("aaabc\0\0\0\0");
     circular_string cstr1 = get_c_str(test);
     cstr1.offset = 1;
     cstr1.length = 9;
@@ -55,7 +55,7 @@ void  test_compare() {
     cstr2.offset = 5; // second '\0'
     test_assert("test with null chars", circular_string_compare(&cstr1, &cstr2) > 0);
 
-    char *test2 = "bcacd";
+    uchar *test2 = UCHAR_PTR("bcacd");
     circular_string cstr_arr[5];
     for (size_t i = 0; i < 5; ++i) {
         cstr_arr[i] = get_c_str(test2);

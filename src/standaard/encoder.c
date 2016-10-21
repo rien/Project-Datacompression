@@ -11,11 +11,11 @@
 
 int encode() {
 
-    char buffer[BLOCK_SIZE];
-    char matrix[BLOCK_SIZE];
+    uchar buffer[BLOCK_SIZE];
+    uchar matrix[BLOCK_SIZE];
     size_t a_read;  // amount of bytes read
     size_t t_start; // starting position of the transformed string
-    while((a_read = fread(buffer, BLOCK_SIZE, sizeof(char), args.source)) > 0){
+    while((a_read = fread(buffer, BLOCK_SIZE, sizeof(uchar), args.source)) > 0){
         burrows_wheeler_encode(buffer, a_read, matrix, &t_start);
         //move_to_front_encode();
 
