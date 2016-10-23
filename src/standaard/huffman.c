@@ -2,8 +2,10 @@
 // Created by rien on 10/20/16.
 //
 
+#include <assert.h>
 #include "huffman.h"
 #include "priorityqueue.h"
+#include "../common/bitcode.h"
 
 void huffman_tree_free(huffman_node *root) {
     if(root->left){
@@ -21,7 +23,6 @@ void huffman_tree_free(huffman_node *root) {
 
 void huffman_dictionary_free(huffman_dictionary *dict) {
     huffman_tree_free(dict->root);
-    free(dict);
 }
 
 huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
@@ -34,20 +35,28 @@ huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
 }
 
 /**
- * Initialize the huffman dictionary by setting
+ * Initialize the huffman dictionary by setting.
  */
 void huffman_init_dictionary(huffman_dictionary* hd) {
     for (size_t i = 0; i < 256; ++i) {
-        hd->codes[i].word = UCHAR(i);
-        hd->leaves[i].codeword = &hd->codes[i];
+        huffman_codeword* hdc = &hd->codes[i];
+        hdc->word = UCHAR(i);
+        hdc->occurrences = 0;
+
+        huffman_node* hdl = &hd->leaves[i];
+        hdl->codeword = hdc;
+        hdl->left = NULL;
+        hdl->right = NULL;
     }
+    hd->root = NULL;
+    bitcode_init(&hd->tree_code);
 }
 
 /**
  * Build a huffman tree for the input.
  */
 void huffman_build_tree(uchar *input, size_t length, huffman_dictionary *hd) {
-    priorityqueue pq;
+    priorityqueue pq = PQ_INIT;
 
     // Count the characters
     for (size_t i = 0; i < length; ++i) {
@@ -57,7 +66,9 @@ void huffman_build_tree(uchar *input, size_t length, huffman_dictionary *hd) {
     // Insert the leaves in a priorityqueue
     for (size_t j = 0; j < 256; ++j) {
         hd->leaves[j].sum = hd->codes[j].occurrences;
-        pq_quick_insert(&hd->leaves[j], &pq);
+        if(hd->leaves[j].sum > 0){
+            pq_quick_insert(&hd->leaves[j], &pq);
+        }
     }
     pq_sort(&pq);
 
@@ -73,6 +84,44 @@ void huffman_build_tree(uchar *input, size_t length, huffman_dictionary *hd) {
     hd->root = pq_remove_last(&pq);
 }
 
-void huffman_build_dictionary(huffman_dictionary *hd) {
+/**
+ * Traverse a huffman tree and set the bitcode of each codeword in the tree.
+ */
+void traverse_tree(huffman_node* root, bitcode* word_code, bitcode* tree_code, bool is_right){
+    bitcode_store_bit(is_right, word_code);
+    if(root->codeword){
+        // we reached a leaf, write the code
+        bitcode_write_all(root->codeword->code, &root->codeword->length, word_code);
 
+        // write to the tree code: 1 + the character
+        bitcode_store_bit(true, tree_code);
+        bitcode_store_byte(root->codeword->word, tree_code);
+    } else {
+        // we do not have a leaf, write 0 to the tree code
+        bitcode_store_bit(false, tree_code);
+
+        // go deeper in the tree
+        traverse_tree(root->left, word_code, tree_code, false);
+        traverse_tree(root->right, word_code, tree_code, true);
+    }
+    bitcode_clear_one(word_code);
+}
+
+/**
+ * Set the bitcodes of the codewords in the huffman-tree while also constructing
+ * the code to store the tree itself.
+ *
+ * The tree itself is stored by traversing the tree in pre-order:
+ *   - if the current node is a leaf, output 1, followed by the character it represents
+ *   - if the current node is not a leaf, output 0 and visit the children
+ */
+void huffman_build_dictionary(huffman_dictionary *hd) {
+    bitcode bc;
+    //TODO: what if there is only 1 char? and 0?
+    bitcode_init(&bc);
+    assert(hd->root->codeword == NULL);
+    bitcode_store_bit(false, &hd->tree_code);
+    traverse_tree(hd->root->left, &bc, &hd->tree_code, false);
+    traverse_tree(hd->root->right, &bc, &hd->tree_code, true);
+    bitcode_free(&bc);
 }
