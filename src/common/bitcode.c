@@ -4,11 +4,13 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <memory.h>
 #include "bitcode.h"
+#include "constanst.h"
 
-#define CURRENT_BIT(bc) (bc->next_bit % 8)
-#define CURRENT_BYTE(bc) (bc->next_bit / 8)
-#define MIN(x,y) (((x) < (y)) ? (x) : (y))
+#define CURRENT_BIT(bc) (bc->length % 8)
+#define CURRENT_BYTE(bc) (bc->length / 8)
+
 
 /**
  * Intialize a new bitcode
@@ -16,7 +18,18 @@
 void bitcode_init(bitcode *bc) {
     bc->array = calloc(sizeof(uchar), 1);
     bc->total_bytes = 1;
-    bc->next_bit = 0;
+    bc->length = 0;
+}
+
+/**
+ * Initialize a new bitcode with the same content as src.
+ * The array of dest should not be allocated.
+ */
+void bitcode_copy(bitcode *src, bitcode *dest) {
+    dest->total_bytes = src->total_bytes;
+    dest->length = src->length;
+    dest->array = malloc(sizeof(uchar)*src->total_bytes);
+    memcpy(dest->array, src->array, sizeof(uchar)*src->total_bytes);
 }
 
 /**
@@ -24,7 +37,7 @@ void bitcode_init(bitcode *bc) {
  */
 void grow_array_if_necessary(size_t growth, bitcode *bc){
     size_t new_size = bc->total_bytes;
-    while(new_size * 8 - 1 < bc->next_bit + growth) {
+    while(new_size * 8 - 1 < bc->length + growth) {
         new_size *= 2;
     }
     if(new_size != bc->total_bytes) {
@@ -44,7 +57,7 @@ void bitcode_store_bit(bool bit, bitcode *bc) {
 
     // We know all unset bits are 0, zo we can just OR the byte
     bc->array[CURRENT_BYTE(bc)] |= bit << CURRENT_BIT(bc);
-    bc->next_bit++;
+    bc->length++;
 }
 
 /**
@@ -56,7 +69,10 @@ void bitcode_write_all(uchar *dest, size_t* bits_written, bitcode *bc) {
     for (size_t i = 0; i < total; ++i) {
         dest[i] = bc->array[i];
     }
-    *bits_written = bc->next_bit;
+    // bits_written can be NULL
+    if(bits_written){
+        *bits_written = bc->length;
+    }
 }
 
 /**
@@ -72,8 +88,8 @@ void bitcode_free(bitcode *bc) {
  * The upper bits will be set to 0.
  */
 void bitcode_clear_until(size_t bit_count, bitcode *bc) {
-    assert(bit_count <= bc->next_bit);
-    size_t difference = bc->next_bit - bit_count;
+    assert(bit_count <= bc->length);
+    size_t difference = bc->length - bit_count;
     size_t byte = CURRENT_BYTE(bc);
 
     // check if the upper most byte is not the destination byte
@@ -97,15 +113,15 @@ void bitcode_clear_until(size_t bit_count, bitcode *bc) {
         bc->array[byte] &= ~(0xFF << (bit_count % 8));
     }
 
-    bc->next_bit = bit_count;
+    bc->length = bit_count;
 }
 
 /**
  * Clear just one bit
  */
 void bitcode_clear_one(bitcode *bc) {
-    assert(bc->next_bit != 0);
-    bc->next_bit--;
+    assert(bc->length != 0);
+    bc->length--;
     bc->array[CURRENT_BYTE(bc)] &= ~(0xFF << (CURRENT_BIT(bc)));
 }
 
@@ -120,7 +136,7 @@ void bitcode_store_byte(uchar byte, bitcode *bc) {
     bc->array[current_byte]   |= (byte << current_bit);     // lower part
     bc->array[current_byte+1] |= (byte >> (8-current_bit)); // upper part
 
-    bc->next_bit += 8;
+    bc->length += 8;
 }
 
 /**
@@ -128,7 +144,8 @@ void bitcode_store_byte(uchar byte, bitcode *bc) {
  */
 void bitcode_append(const bitcode *src, bitcode *dest) {
     assert(src != dest);
-    grow_array_if_necessary(src->next_bit, dest);
+    grow_array_if_necessary(src->length, dest);
+    size_t to_copy = NEXT_DIV(src->length,8);
     size_t bits_copied = 0;
     size_t current_byte_src = 0;
     size_t current_byte_dest = CURRENT_BYTE(dest);
@@ -137,8 +154,8 @@ void bitcode_append(const bitcode *src, bitcode *dest) {
 
     dest->array[current_byte_dest] |= (src->array[current_byte_src] << shift_left);
     current_byte_dest++;
-    bits_copied += MIN(shift_right,src->next_bit);
-    while(bits_copied + 8 < src->next_bit){
+    bits_copied += MIN(shift_right,src->length);
+    while(bits_copied + 8 <= to_copy){
         dest->array[current_byte_dest] |= src->array[current_byte_src] >> shift_right;
         current_byte_src++;
 
@@ -146,13 +163,15 @@ void bitcode_append(const bitcode *src, bitcode *dest) {
         current_byte_dest++;
         bits_copied += 8;
     }
-    if(bits_copied < src->next_bit){
+    if(bits_copied != src->length){
         dest->array[current_byte_dest] |= src->array[current_byte_src] >> (shift_right % 8);
-        bits_copied += MIN(shift_left,CURRENT_BIT(src)-shift_right);
+        bits_copied += shift_left;
     }
-    assert(bits_copied == src->next_bit);
-    dest->next_bit += src->next_bit;
+    assert(bits_copied >= src->length);
+    dest->length += src->length;
 }
+
+
 
 
 #undef CURRENT_BIT

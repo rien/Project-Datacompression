@@ -16,11 +16,13 @@ typedef struct {
     // total bytes reserved in the array
     size_t total_bytes;
 
-    // next bit to be written, always points to a 0
-    size_t next_bit;
+    // length of the current bitcode, always points to a 0
+    size_t length;
 } bitcode;
 
 void bitcode_init(bitcode* bc);
+
+void bitcode_copy(bitcode* src, bitcode* dest);
 
 void bitcode_free(bitcode* bc);
 

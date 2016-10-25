@@ -13,8 +13,7 @@
 
 typedef struct {
     uchar word;
-    uchar code[32]; // A huffman code is maximum 255 characters long
-    size_t length;
+    bitcode bitcode;
     size_t occurrences;
 } huffman_codeword;
 

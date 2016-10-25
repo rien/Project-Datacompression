@@ -5,6 +5,8 @@
 #include <assert.h>
 #include "huffman.h"
 #include "priorityqueue.h"
+#include "../common/bitcode.h"
+#include "../common/constanst.h"
 
 void huffman_tree_free(huffman_node *root) {
     if(root->left){
@@ -90,7 +92,7 @@ void traverse_tree(huffman_node* root, bitcode* word_code, bitcode* tree_code, b
     bitcode_store_bit(is_right, word_code);
     if(root->codeword){
         // we reached a leaf, write the code
-        bitcode_write_all(root->codeword->code, &root->codeword->length, word_code);
+        bitcode_copy(word_code, &root->codeword->bitcode);
 
         // write to the tree code: 1 + the character
         bitcode_store_bit(true, tree_code);
@@ -122,7 +124,10 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
         // There is only 1 codeword
         bitcode_store_bit(true, &hd->tree_code);
         bitcode_store_byte(hd->root->codeword->word, &hd->tree_code);
-        hd->root->codeword->length = 1; //code is just 0
+
+        //code is just 0
+        bitcode_init(&hd->root->codeword->bitcode);
+        bitcode_store_bit(false, &hd->root->codeword->bitcode);
     } else {
         bitcode_store_bit(false, &hd->tree_code);
         traverse_tree(hd->root->left, &bc, &hd->tree_code, false);
@@ -136,8 +141,28 @@ uchar *huffman_encode(uchar *input, size_t length, size_t *output_length) {
     huffman_init_dictionary(&hd);
     huffman_build_tree(input, length, &hd);
     huffman_build_dictionary(&hd);
+
+    unsigned short int tree_code_length = (unsigned short int) hd.tree_code.length;
+
+    bitcode output;
+    bitcode_init(&output);
+
+    // lower bits
+    bitcode_store_byte((uchar) tree_code_length, &output);
+
+    // higher bits
+    bitcode_store_byte((uchar) tree_code_length << 8, &output);
+
+    // tree code itself
+    bitcode_append(&hd.tree_code, &output);
+
     for (size_t i = 0; i < length; ++i) {
-        
+        bitcode_append(&hd.codes[input[i]].bitcode ,&output);
     }
-    return NULL;
+    *output_length = NEXT_DIV(output.length,8);
+
+    uchar* output_str = malloc(sizeof(uchar)*(*output_length));
+    bitcode_write_all(output_str,NULL,&output);
+    bitcode_free(&output);
+    return output_str;
 }
