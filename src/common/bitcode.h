@@ -28,6 +28,8 @@ void bitcode_store_bit(bool bit, bitcode* bc);
 
 void bitcode_store_byte(uchar byte, bitcode* bc);
 
+void bitcode_append(const bitcode* src, bitcode* dest);
+
 void bitcode_write_all(uchar *dest, size_t* bits_written, bitcode *bc);
 
 void bitcode_clear_until(size_t bit_count, bitcode* bc);

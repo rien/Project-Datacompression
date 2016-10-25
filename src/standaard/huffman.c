@@ -5,7 +5,6 @@
 #include <assert.h>
 #include "huffman.h"
 #include "priorityqueue.h"
-#include "../common/bitcode.h"
 
 void huffman_tree_free(huffman_node *root) {
     if(root->left){
@@ -117,11 +116,28 @@ void traverse_tree(huffman_node* root, bitcode* word_code, bitcode* tree_code, b
  */
 void huffman_build_dictionary(huffman_dictionary *hd) {
     bitcode bc;
-    //TODO: what if there is only 1 char? and 0?
     bitcode_init(&bc);
-    assert(hd->root->codeword == NULL);
-    bitcode_store_bit(false, &hd->tree_code);
-    traverse_tree(hd->root->left, &bc, &hd->tree_code, false);
-    traverse_tree(hd->root->right, &bc, &hd->tree_code, true);
+    assert(hd->root);
+    if(hd->root->codeword ){
+        // There is only 1 codeword
+        bitcode_store_bit(true, &hd->tree_code);
+        bitcode_store_byte(hd->root->codeword->word, &hd->tree_code);
+        hd->root->codeword->length = 1; //code is just 0
+    } else {
+        bitcode_store_bit(false, &hd->tree_code);
+        traverse_tree(hd->root->left, &bc, &hd->tree_code, false);
+        traverse_tree(hd->root->right, &bc, &hd->tree_code, true);
+    }
     bitcode_free(&bc);
+}
+
+uchar *huffman_encode(uchar *input, size_t length, size_t *output_length) {
+    huffman_dictionary hd;
+    huffman_init_dictionary(&hd);
+    huffman_build_tree(input, length, &hd);
+    huffman_build_dictionary(&hd);
+    for (size_t i = 0; i < length; ++i) {
+        
+    }
+    return NULL;
 }

@@ -43,9 +43,9 @@ void huffman_build_dictionary(huffman_dictionary* hd);
 
 void huffman_dictionary_free(huffman_dictionary* hd);
 
-uchar* huffman_encode(uchar input[], size_t length, size_t* output_length, huffman_dictionary* tree);
+uchar* huffman_encode(uchar input[], size_t length, size_t* output_length);
 
-uchar* huffman_decode(uchar input[], size_t length, size_t* output_length, huffman_dictionary* tree);
+uchar* huffman_decode(uchar input[], size_t length, size_t* output_length);
 
 
 #endif //DA3_PROJECT_HUFFMAN_H

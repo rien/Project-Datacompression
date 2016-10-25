@@ -211,6 +211,64 @@ void test_clear_one(){
     test_assert("Data", bc.array[1] == 0 && bc.array[0] == 0);
 }
 
+void test_append(){
+    bitcode bc[4];
+    for (size_t i = 0; i < 4; ++i) {
+        bitcode_init(&bc[i]);
+    }
+
+    // bc0: 11111
+    bitcode_store_bit(true, &bc[0]);
+    bitcode_store_bit(true, &bc[0]);
+    bitcode_store_bit(false, &bc[0]);
+
+    bitcode_store_bit(true, &bc[1]);
+    bitcode_store_bit(false, &bc[1]);
+    bitcode_store_bit(true, &bc[1]);
+
+    // no overflow
+    bitcode_append(&bc[1], &bc[0]);
+    test_assert("Size should be 6", bc[0].next_bit == 6);
+    test_assert("Content", bc[0].array[0] == 0b101011);
+
+    // with overflow
+    bitcode_append(&bc[1], &bc[0]);
+    test_assert("Size should be 9", bc[0].next_bit == 9);
+    test_assert("Content 0", bc[0].array[0] == 0b01101011);
+    test_assert("Content 1", bc[0].array[1] == 0b1);
+
+    // more than 8 bits
+    bitcode_store_byte(0b01010101, &bc[2]);
+    bitcode_store_byte(0b01010101, &bc[2]);
+    bitcode_store_byte(0b01010101, &bc[2]);
+
+    bitcode_append(&bc[2], &bc[0]);
+    test_assert("Size should be 33", bc[0].next_bit == 33);
+    test_assert("Content 0", bc[0].array[0] == 0b01101011);
+    test_assert("Content 1", bc[0].array[1] == 0b10101011);
+    test_assert("Content 2", bc[0].array[2] == 0b10101010);
+    test_assert("Content 3", bc[0].array[3] == 0b10101010);
+    test_assert("Content 4", bc[0].array[4] == 0b0);
+
+    // exact 8 bit aligned
+    bitcode_store_byte(0b11110000, &bc[3]);
+    bitcode_store_byte(0b11110000, &bc[3]);
+    bitcode_append(&bc[2], &bc[3]);
+    test_assert("Size should be 40", bc[3].next_bit == 40);
+    test_assert("Content 0", bc[3].array[0] == 0b11110000);
+    test_assert("Content 1", bc[3].array[1] == 0b11110000);
+    test_assert("Content 2", bc[3].array[2] == 0b01010101);
+    test_assert("Content 3", bc[3].array[3] == 0b01010101);
+    test_assert("Content 4", bc[3].array[4] == 0b01010101);
+
+
+
+
+
+
+
+
+}
 
 
 void test_bitcode(){
@@ -218,4 +276,5 @@ void test_bitcode(){
     test_store_byte();
     test_clear();
     test_clear_one();
+    test_append();
 }

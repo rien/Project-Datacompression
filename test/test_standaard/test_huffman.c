@@ -60,13 +60,13 @@ void test_huffman(){
     // E    01000101
     // Dictionary code: 001A1C01E01D1B
     test_assert("Tree code length", hd.tree_code.next_bit == 49);
-    test_assert("Tree code 0", hd.tree_code.array[0] == 0b00001100); //001A
-    test_assert("Tree code 1", hd.tree_code.array[1] == 0b01110100); //A1C
-    test_assert("Tree code 2", hd.tree_code.array[2] == 0b11001000); //C01E
-    test_assert("Tree code 3", hd.tree_code.array[3] == 0b00100010); //E0
-    test_assert("Tree code 4", hd.tree_code.array[4] == 0b10001001); //1D
-    test_assert("Tree code 5", hd.tree_code.array[5] == 0b00001010); //D1B
-    test_assert("Tree code 6", hd.tree_code.array[6] == 0b01);       //B
+    test_assert("Tree code 0", hd.tree_code.array[0] == 0b00001100); // 01A
+    test_assert("Tree code 1", hd.tree_code.array[1] == 0b00111010); //A1C
+    test_assert("Tree code 2", hd.tree_code.array[2] == 0b01100100); //C01E
+    test_assert("Tree code 3", hd.tree_code.array[3] == 0b10010001); //E01
+    test_assert("Tree code 4", hd.tree_code.array[4] == 0b01000100); //D
+    test_assert("Tree code 5", hd.tree_code.array[5] == 0b10000101); //1B
+    test_assert("Tree code 6", hd.tree_code.array[6] == 0b0);        //B
 
     huffman_dictionary_free(&hd);
 }
