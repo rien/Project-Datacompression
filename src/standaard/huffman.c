@@ -5,8 +5,7 @@
 #include <assert.h>
 #include "huffman.h"
 #include "priorityqueue.h"
-#include "../common/bitcode.h"
-#include "../common/constanst.h"
+
 
 void huffman_tree_free(huffman_node *root) {
     if(root->left){
@@ -17,13 +16,16 @@ void huffman_tree_free(huffman_node *root) {
     }
     // If a node is a leaf (it has a codeword) it should not be freed,
     // leaves are part of the huffman_dictionary struct.
-    if(!root->codeword){
+    if(root->codeword){
+        bitcode_free(&root->codeword->bitcode);
+    } else {
         free(root);
     }
 }
 
-void huffman_dictionary_free(huffman_dictionary *dict) {
+void huffman_free_dictionary(huffman_dictionary *dict) {
     huffman_tree_free(dict->root);
+    bitcode_free(&dict->tree_code);
 }
 
 huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
@@ -33,24 +35,6 @@ huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
     parent->codeword = NULL;
     parent->sum = left->sum + right->sum;
     return parent;
-}
-
-/**
- * Initialize the huffman dictionary by setting.
- */
-void huffman_init_dictionary(huffman_dictionary* hd) {
-    for (size_t i = 0; i < 256; ++i) {
-        huffman_codeword* hdc = &hd->codes[i];
-        hdc->word = UCHAR(i);
-        hdc->occurrences = 0;
-
-        huffman_node* hdl = &hd->leaves[i];
-        hdl->codeword = hdc;
-        hdl->left = NULL;
-        hdl->right = NULL;
-    }
-    hd->root = NULL;
-    bitcode_init(&hd->tree_code);
 }
 
 /**
@@ -84,6 +68,7 @@ void huffman_build_tree(uchar *input, size_t length, huffman_dictionary *hd) {
     }
     hd->root = pq_remove_last(&pq);
 }
+
 
 /**
  * Traverse a huffman tree and set the bitcode of each codeword in the tree.
@@ -136,11 +121,29 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
     bitcode_free(&bc);
 }
 
+/**
+ * Initialize the huffman dictionary by setting.
+ */
+void huffman_init_dictionary(uchar *input, size_t length, huffman_dictionary *hd) {
+    for (size_t i = 0; i < 256; ++i) {
+        huffman_codeword* hdc = &hd->codes[i];
+        hdc->word = UCHAR(i);
+        hdc->occurrences = 0;
+
+        huffman_node* hdl = &hd->leaves[i];
+        hdl->codeword = hdc;
+        hdl->left = NULL;
+        hdl->right = NULL;
+    }
+    hd->root = NULL;
+    bitcode_init(&hd->tree_code);
+    huffman_build_tree(input, length, hd);
+    huffman_build_dictionary(hd);
+}
+
 uchar *huffman_encode(uchar *input, size_t length, size_t *output_length) {
     huffman_dictionary hd;
-    huffman_init_dictionary(&hd);
-    huffman_build_tree(input, length, &hd);
-    huffman_build_dictionary(&hd);
+    huffman_init_dictionary(input, length, &hd);
 
     unsigned short int tree_code_length = (unsigned short int) hd.tree_code.length;
 
@@ -157,12 +160,14 @@ uchar *huffman_encode(uchar *input, size_t length, size_t *output_length) {
     bitcode_append(&hd.tree_code, &output);
 
     for (size_t i = 0; i < length; ++i) {
-        bitcode_append(&hd.codes[input[i]].bitcode ,&output);
+        bitcode_append(&hd.codes[input[i]].bitcode, &output);
     }
-    *output_length = NEXT_DIV(output.length,8);
+    *output_length = ((output.length-1)/8)+1;
+    size_t malloc_size = sizeof(uchar)*(*output_length);
+    uchar* output_str = calloc(*output_length, sizeof(uchar));
+    bitcode_write_all(output_str, NULL, &output);
 
-    uchar* output_str = malloc(sizeof(uchar)*(*output_length));
-    bitcode_write_all(output_str,NULL,&output);
+    huffman_free_dictionary(&hd);
     bitcode_free(&output);
     return output_str;
 }

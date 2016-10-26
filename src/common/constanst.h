@@ -5,7 +5,7 @@
 #ifndef DA3_PROJECT_CONSTANST_H
 #define DA3_PROJECT_CONSTANST_H
 
-#define BLOCK_SIZE 4096
+#define BLOCK_SIZE 131072
 
 #define NEXT_DIV(n,d) (((((n)-1)/(d))+1)*(d))
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))

@@ -224,3 +224,6 @@ pythontex-files-*/
 
 # todonotes
 *.tdo
+
+# valgrind
+vgcore.*

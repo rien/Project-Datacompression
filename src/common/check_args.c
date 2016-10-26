@@ -12,8 +12,12 @@ void graceful_exit_printf(const char *msg,...) {
     printf(msg); //expand varargs
     printf("Usage: %s {-d|-c} source destination\n", program_name);
     // close files, doesn't matter if they are open or not
-    fclose(args.source);
-    fclose(args.destination);
+    if(args.source){
+        fclose(args.source);
+    }
+    if(args.destination){
+        fclose(args.destination);
+    }
     exit(1);
 }
 
@@ -33,10 +37,10 @@ void parse_arguments(arguments* args, int argc, char **argv) {
     // open files and check if everything is ok
     args->source = fopen(argv[2],"r");
     if(args->source == NULL){
-        graceful_exit_printf("Could not open file for reading: %s", args->source);
+        graceful_exit_printf("Could not open file for reading: %s\n", argv[2]);
     }
     args->destination = fopen(argv[3], "w");
     if(args->destination == NULL){
-        graceful_exit_printf("Could not open file for writing: %s", args->destination);
+        graceful_exit_printf("Could not open file for writing: %s\n", argv[3]);
     }
 }

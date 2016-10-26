@@ -34,13 +34,9 @@ typedef struct {
     bitcode tree_code;
 } huffman_dictionary;
 
-void huffman_init_dictionary(huffman_dictionary* hd);
+void huffman_init_dictionary(uchar input[], size_t length, huffman_dictionary* hd);
 
-void huffman_build_tree(uchar input[], size_t length, huffman_dictionary* hd);
-
-void huffman_build_dictionary(huffman_dictionary* hd);
-
-void huffman_dictionary_free(huffman_dictionary* hd);
+void huffman_free_dictionary(huffman_dictionary* hd);
 
 uchar* huffman_encode(uchar input[], size_t length, size_t* output_length);
 

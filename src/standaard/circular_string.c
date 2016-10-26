@@ -3,6 +3,7 @@
 //
 
 #include <stdlib.h>
+#include <assert.h>
 #include "circular_string.h"
 #include "stdio.h"
 
@@ -20,10 +21,12 @@ int circular_string_compare(const void* a, const void* b) {
     circular_string* cstr_b = (circular_string*) b;
     size_t i = 0;
     int diff;
+    assert(cstr_a->length == cstr_b->length);
+    size_t length = cstr_a->length;
     do{
         diff = circular_string_get(cstr_a, i) - circular_string_get(cstr_b, i);
         ++i;
-    } while (diff == 0);
+    } while (diff == 0 && i < length);
     return diff;
 }
 

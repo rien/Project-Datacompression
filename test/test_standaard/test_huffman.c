@@ -7,12 +7,13 @@
 #include "../../src/common/bitcode.h"
 
 void test_huffman(){
-    huffman_dictionary hd;
-    huffman_init_dictionary(&hd);
+
 
     uchar* input = UCHAR_PTR("AAAAAABCCCCCCDDEEEEE");
     size_t input_length = strlen((char*)input);
-    huffman_build_tree(input, input_length, &hd);
+
+    huffman_dictionary hd;
+    huffman_init_dictionary(input, input_length, &hd);
     /*
      * The tree should look like this:
      *
@@ -41,7 +42,6 @@ void test_huffman(){
     test_assert("Root right right left char", hd.root->right->right->right->codeword->word == 'B');
     test_assert("Root right right right char", hd.root->right->right->left->codeword->word == 'D');
 
-    huffman_build_dictionary(&hd);
     test_assert("A's code", hd.codes['A'].bitcode.array[0] == 0b00);
     test_assert("A's length", hd.codes['A'].bitcode.length == 2);
     test_assert("B's code", hd.codes['B'].bitcode.array[0] == 0b111);
@@ -68,7 +68,7 @@ void test_huffman(){
     test_assert("Tree code 4", hd.tree_code.array[4] == 0b01000100); //D
     test_assert("Tree code 5", hd.tree_code.array[5] == 0b10000101); //1B
     test_assert("Tree code 6", hd.tree_code.array[6] == 0b0);        //B
-    huffman_dictionary_free(&hd);
+    huffman_free_dictionary(&hd);
 
 
     size_t output_length;

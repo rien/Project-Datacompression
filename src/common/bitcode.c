@@ -64,11 +64,9 @@ void bitcode_store_bit(bool bit, bitcode *bc) {
  * Write all the bits in the current code to an uchar array.
  * This expects the destinatio to be large enough.
  */
-void bitcode_write_all(uchar *dest, size_t* bits_written, bitcode *bc) {
-    size_t total = CURRENT_BYTE(bc) + 1;
-    for (size_t i = 0; i < total; ++i) {
-        dest[i] = bc->array[i];
-    }
+void bitcode_write_all(uchar *dest, size_t* bits_written,const bitcode *bc) {
+    size_t total = (bc->length-1)/8+1;
+    memcpy(dest, bc->array, sizeof(uchar)*total);
     // bits_written can be NULL
     if(bits_written){
         *bits_written = bc->length;
