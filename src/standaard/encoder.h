@@ -13,6 +13,6 @@ extern arguments args;
 
 extern bool do_burrows_wheeler;
 
-int encode();
+void encode();
 
 #endif //DA3_PROJECT_ENCODER_H

@@ -8,8 +8,8 @@
 #include "../test_common/testmacro.h"
 
 void test_encode(){
-    uchar* input = UCHAR_PTR("boom|gaat");
-    uchar output[9];
+    byte* input = BYTE_PTR("boom|gaat");
+    byte output[9];
     size_t start_pos;
     burrows_wheeler_encode(input, 9, output, &start_pos);
     test_assert("Start pos not correct", 6);

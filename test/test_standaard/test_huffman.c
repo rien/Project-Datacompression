@@ -2,18 +2,19 @@
 // Created by rien on 10/23/16.
 //
 
+#include <collection_tools.h>
 #include "test_huffman.h"
 #include "../../src/standaard/huffman.h"
 #include "../../src/common/bitcode.h"
 
 void test_huffman(){
 
-
-    uchar* input = UCHAR_PTR("AAAAAABCCCCCCDDEEEEE");
+    byte buffer[BLOCK_SIZE];
+    byte* input = BYTE_PTR("AAAAAABCCCCCCDDEEEEE");
     size_t input_length = strlen((char*)input);
 
     huffman_dictionary hd;
-    huffman_init_dictionary(input, input_length, &hd);
+    huffman_init(input, input_length, &hd);
     /*
      * The tree should look like this:
      *
@@ -72,20 +73,19 @@ void test_huffman(){
 
 
     size_t output_length;
-    uchar* encoded = huffman_encode(input, input_length, &output_length);
+    huffman_encode(input, input_length, buffer, &output_length);
 
-    test_assert("Tree code length",*(unsigned short int*)encoded == 49);
-    test_assert("Encoded tree 0", encoded[2] == 0b00001100);
-    test_assert("Encoded tree 1", encoded[3] == 0b00111010);
-    test_assert("Encoded tree 2", encoded[4] == 0b01100100);
-    test_assert("Encoded tree 3", encoded[5] == 0b10010001);
-    test_assert("Encoded tree 4", encoded[6] == 0b01000100);
-    test_assert("Encoded tree 5", encoded[7] == 0b10000101);
-    test_assert("Encoded tree 6", encoded[8] == 0b00000000);
-    test_assert("Encoded tree 7", encoded[9] == 0b11100000);
-    test_assert("Encoded tree 8", encoded[10] == 0b10101010);
-    test_assert("Encoded tree 9", encoded[11] == 0b10111010);
-    test_assert("Encoded tree 10", encoded[12] == 0b01010101);
-    test_assert("Encoded tree 11", encoded[13] == 0b0101);
-    free(encoded);
+    test_assert("Tree code length",*(unsigned short int*)buffer == 49);
+    test_assert("Encoded tree 0", buffer[2] == 0b00001100);
+    test_assert("Encoded tree 1", buffer[3] == 0b00111010);
+    test_assert("Encoded tree 2", buffer[4] == 0b01100100);
+    test_assert("Encoded tree 3", buffer[5] == 0b10010001);
+    test_assert("Encoded tree 4", buffer[6] == 0b01000100);
+    test_assert("Encoded tree 5", buffer[7] == 0b10000101);
+    test_assert("Encoded tree 6", buffer[8] == 0b00000000);
+    test_assert("Encoded tree 7", buffer[9] == 0b11100000);
+    test_assert("Encoded tree 8", buffer[10] == 0b10101010);
+    test_assert("Encoded tree 9", buffer[11] == 0b10111010);
+    test_assert("Encoded tree 10", buffer[12] == 0b01010101);
+    test_assert("Encoded tree 11", buffer[13] == 0b0101);
 }

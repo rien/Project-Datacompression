@@ -40,7 +40,7 @@ huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
 /**
  * Build a huffman tree for the input.
  */
-void huffman_build_tree(uchar *input, size_t length, huffman_dictionary *hd) {
+void huffman_build_tree(byte *input, size_t length, huffman_dictionary *hd) {
     priorityqueue pq = PQ_INIT;
 
     // Count the characters
@@ -124,10 +124,10 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
 /**
  * Initialize the huffman dictionary by setting.
  */
-void huffman_init_dictionary(uchar *input, size_t length, huffman_dictionary *hd) {
+void huffman_init(byte *input, size_t length, huffman_dictionary *hd) {
     for (size_t i = 0; i < 256; ++i) {
         huffman_codeword* hdc = &hd->codes[i];
-        hdc->word = UCHAR(i);
+        hdc->word = BYTE(i);
         hdc->occurrences = 0;
 
         huffman_node* hdl = &hd->leaves[i];
@@ -141,33 +141,32 @@ void huffman_init_dictionary(uchar *input, size_t length, huffman_dictionary *hd
     huffman_build_dictionary(hd);
 }
 
-uchar *huffman_encode(uchar *input, size_t length, size_t *output_length) {
+void huffman_encode(byte *input, size_t length, byte *output, size_t *output_length) {
     huffman_dictionary hd;
-    huffman_init_dictionary(input, length, &hd);
+    bitcode output_code;
+    bitcode_init(&output_code);
+
+    // this calculates the huffman tree and the bitcodes
+    huffman_init(input, length, &hd);
 
     unsigned short int tree_code_length = (unsigned short int) hd.tree_code.length;
 
-    bitcode output;
-    bitcode_init(&output);
-
-    // lower bits
-    bitcode_store_byte((uchar) tree_code_length, &output);
-
-    // higher bits
-    bitcode_store_byte((uchar) tree_code_length << 8, &output);
+    // write the length of the tree code (first the lower byte, then the higher byte)
+    bitcode_store_byte((byte) tree_code_length, &output_code);
+    bitcode_store_byte((byte) tree_code_length << 8, &output_code);
 
     // tree code itself
-    bitcode_append(&hd.tree_code, &output);
+    bitcode_append(&hd.tree_code, &output_code);
 
+    // construct the encoded output
     for (size_t i = 0; i < length; ++i) {
-        bitcode_append(&hd.codes[input[i]].bitcode, &output);
+        bitcode_append(&hd.codes[input[i]].bitcode, &output_code);
     }
-    *output_length = ((output.length-1)/8)+1;
-    size_t malloc_size = sizeof(uchar)*(*output_length);
-    uchar* output_str = calloc(*output_length, sizeof(uchar));
-    bitcode_write_all(output_str, NULL, &output);
+
+    // write the bitcode to the buffer
+    bitcode_write_all(output, output_length, &output_code);
+
 
     huffman_free_dictionary(&hd);
-    bitcode_free(&output);
-    return output_str;
+    bitcode_free(&output_code);
 }

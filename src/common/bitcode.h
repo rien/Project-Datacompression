@@ -11,7 +11,7 @@
 
 typedef struct {
     // array to store the bits
-    uchar* array;
+    byte* array;
 
     // total bytes reserved in the array
     size_t total_bytes;
@@ -28,11 +28,11 @@ void bitcode_free(bitcode* bc);
 
 void bitcode_store_bit(bool bit, bitcode* bc);
 
-void bitcode_store_byte(uchar byte, bitcode* bc);
+void bitcode_store_byte(byte byte, bitcode* bc);
 
 void bitcode_append(const bitcode* src, bitcode* dest);
 
-void bitcode_write_all(uchar *dest, size_t* bits_written,const bitcode *bc);
+void bitcode_write_all(byte *dest, size_t* bytes_written,const bitcode *bc);
 
 void bitcode_clear_until(size_t bit_count, bitcode* bc);
 

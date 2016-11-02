@@ -9,7 +9,7 @@
 #include "../test_common/testmacro.h"
 
 
-circular_string get_c_str(uchar* base){
+circular_string get_c_str(byte* base){
     circular_string c_str;
     c_str.base = base;
     c_str.length = strlen((char*)base);
@@ -18,7 +18,7 @@ circular_string get_c_str(uchar* base){
 }
 
 void test_get(){
-    uchar* str = UCHAR_PTR("Hallo test string.");
+    byte* str = BYTE_PTR("Hallo test string.");
     circular_string c_str = get_c_str(str);
 
 
@@ -33,14 +33,14 @@ void test_get(){
 }
 
 void test_get_last(){
-    uchar* str = UCHAR_PTR("Hallo test string.");
+    byte* str = BYTE_PTR("Hallo test string.");
     circular_string c_str = get_c_str(str);
 
     test_assert("Expected '.'", circular_string_last(&c_str) == '.');
 }
 
 void  test_compare() {
-    uchar* test  = UCHAR_PTR("aaabc\0\0\0\0");
+    byte* test  = BYTE_PTR("aaabc\0\0\0\0");
     circular_string cstr1 = get_c_str(test);
     cstr1.offset = 1;
     cstr1.length = 9;
@@ -49,26 +49,30 @@ void  test_compare() {
     cstr2.offset = 2;
     cstr2.length = 9;
 
-    test_assert("test with normal character", circular_string_compare(&cstr1, &cstr2) < 0);
+    circular_string* cstr_ptr[] = {&cstr1, &cstr2};
+
+    test_assert("test with normal character", circular_string_compare(&cstr_ptr[0], &cstr_ptr[1]) < 0);
 
     cstr1.offset = 6; // first '\0'
     cstr2.offset = 5; // second '\0'
-    test_assert("test with null chars", circular_string_compare(&cstr1, &cstr2) > 0);
+    test_assert("test with null chars", circular_string_compare(&cstr_ptr[0], &cstr_ptr[1]) > 0);
 
-    uchar *test2 = UCHAR_PTR("bcacd");
+    byte *test2 = BYTE_PTR("bcacd");
     circular_string cstr_arr[5];
+    circular_string* cstr_arr_ptr[5];
     for (size_t i = 0; i < 5; ++i) {
         cstr_arr[i] = get_c_str(test2);
         cstr_arr[i].offset = i;
+        cstr_arr_ptr[i] = &cstr_arr[i];
     }
 
-    qsort(cstr_arr, 4, sizeof(circular_string), circular_string_compare);
+    qsort(cstr_arr_ptr, 4, sizeof(circular_string*), circular_string_compare);
 
-    test_assert("Sorted 0 should be 'a'", circular_string_first(&cstr_arr[0]) == 'a');
-    test_assert("Sorted 1 should be 'b'", circular_string_first(&cstr_arr[1]) == 'b');
-    test_assert("Sorted 2 should be 'c'", circular_string_first(&cstr_arr[2]) == 'c');
-    test_assert("Sorted 3 should be 'c'", circular_string_first(&cstr_arr[3]) == 'c');
-    test_assert("Sorted 4 should be 'd'", circular_string_first(&cstr_arr[4]) == 'd');
+    test_assert("Sorted 0 should be 'a'", circular_string_first(cstr_arr_ptr[0]) == 'a');
+    test_assert("Sorted 1 should be 'b'", circular_string_first(cstr_arr_ptr[1]) == 'b');
+    test_assert("Sorted 2 should be 'c'", circular_string_first(cstr_arr_ptr[2]) == 'c');
+    test_assert("Sorted 3 should be 'c'", circular_string_first(cstr_arr_ptr[3]) == 'c');
+    test_assert("Sorted 4 should be 'd'", circular_string_first(cstr_arr_ptr[4]) == 'd');
 
 }
 

@@ -11,8 +11,6 @@ char* program_name = "standaard";
 
 arguments args;
 
-bool do_burrows_wheeler = true;
-
 int main(int argc, char* argv[]) {
     parse_arguments(&args, argc, argv);
 

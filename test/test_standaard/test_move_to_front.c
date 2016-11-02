@@ -9,20 +9,20 @@
 #include "../test_common/testmacro.h"
 
 void test_move_to_front(){
-    uchar* test =  UCHAR_PTR("Dit is een lange tekst die successvol moet omgezet worden.");
+    byte* test =  BYTE_PTR("Dit is een lange tekst die successvol moet omgezet worden.");
     size_t length = strlen((char*)test);
-    uchar* buffer = calloc(length+1, sizeof(uchar));
-    uchar* result = calloc(length+1, sizeof(uchar));
+    byte* buffer = calloc(length+1, sizeof(byte));
+    byte* result = calloc(length+1, sizeof(byte));
     move_to_front_encode(test, buffer, length);
     move_to_front_decode(buffer, result, length);
     test_assert("Move to front does not decode or encode correctly", strcmp((char*) test, (char*) result) == 0);
     free(buffer);
     free(result);
 
-    uchar* test2 = UCHAR_PTR("Deze\0\125string bevat\0 \255rare karakters!");
+    byte* test2 = BYTE_PTR("Deze\0\125string bevat\0 \255rare karakters!");
     size_t length2 = 36;
-    buffer = calloc(length2+1, sizeof(uchar));
-    result = calloc(length2+1, sizeof(uchar));
+    buffer = calloc(length2+1, sizeof(byte));
+    result = calloc(length2+1, sizeof(byte));
     move_to_front_encode(test2, buffer, length2);
     move_to_front_decode(buffer, result, length2);
     for (size_t i = 0; i < length2; ++i) {

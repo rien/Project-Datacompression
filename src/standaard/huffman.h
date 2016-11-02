@@ -12,7 +12,7 @@
 #include "../common/bitcode.h"
 
 typedef struct {
-    uchar word;
+    byte word;
     bitcode bitcode;
     size_t occurrences;
 } huffman_codeword;
@@ -34,13 +34,13 @@ typedef struct {
     bitcode tree_code;
 } huffman_dictionary;
 
-void huffman_init_dictionary(uchar input[], size_t length, huffman_dictionary* hd);
+void huffman_init(byte input[], size_t length, huffman_dictionary *hd);
 
 void huffman_free_dictionary(huffman_dictionary* hd);
 
-uchar* huffman_encode(uchar input[], size_t length, size_t* output_length);
+void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
 
-uchar* huffman_decode(uchar input[], size_t length, size_t* output_length);
+void huffman_decode(byte input[], size_t length, byte output[], size_t* output_length);
 
 
 #endif //DA3_PROJECT_HUFFMAN_H

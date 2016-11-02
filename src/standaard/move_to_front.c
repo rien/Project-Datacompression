@@ -12,8 +12,8 @@
 /*
  * Return the index of character c in the table and move it to the front (adjust its index to 0)
  */
-uchar move_to_front(uchar c, uchar *table){
-    uchar index = table[c];
+byte move_to_front(byte c, byte *table){
+    byte index = table[c];
     for (size_t i = 0; i < TABLE_SIZE; ++i) {
         if(table[i] < index){
             table[i]++;
@@ -23,27 +23,27 @@ uchar move_to_front(uchar c, uchar *table){
     return index;
 }
 
-void init_table(uchar *table){
+void init_table(byte *table){
     for (size_t i = 0; i < TABLE_SIZE; ++i) {
-        table[i] = (uchar)i;
+        table[i] = (byte)i;
     }
 }
 
 
-void move_to_front_encode(uchar *input, uchar *output, size_t length) {
-    uchar table[TABLE_SIZE];
+void move_to_front_encode(byte *input, byte *output, size_t length) {
+    byte table[TABLE_SIZE];
     init_table(table);
     for (size_t i = 0; i < length; ++i ) {
-        output[i] = move_to_front(UCHAR(input[i]), table);
+        output[i] = move_to_front(BYTE(input[i]), table);
     }
 }
 
-void move_to_front_decode(uchar *input, uchar *output, size_t length) {
-    uchar table[TABLE_SIZE];
+void move_to_front_decode(byte *input, byte *output, size_t length) {
+    byte table[TABLE_SIZE];
     init_table(table);
     for (size_t i = 0; i < length; ++i) {
-        uchar index = UCHAR(input[i]);
-        uchar c = table[index];
+        byte index = BYTE(input[i]);
+        byte c = table[index];
         // copying memory with memmove can overlap
         memmove(&table[1], &table[0], (size_t)index);
         table[0] = c;

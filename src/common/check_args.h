@@ -6,6 +6,8 @@
 #define DA3_PROJECT_CHECK_ARGS_H
 
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #define ARG_COUNT 3
 
@@ -20,6 +22,8 @@ typedef struct {
     FILE* source;
     FILE* destination;
     option_type option;
+    uint16_t block_size;
+    bool bw_transform;
 } arguments;
 
 void graceful_exit_printf(const char *msg,...);

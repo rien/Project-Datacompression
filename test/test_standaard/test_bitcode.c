@@ -45,11 +45,11 @@ void test_store(){
     test_assert("Should have written 19 bits", bc.length == 19);
     test_assert("Third byte", bc.array[2] == 0b101);
 
-    uchar test[3];
+    byte test[3];
     size_t written;
     bitcode_write_all(test, &written, &bc);
 
-    test_assert("Should have written 19 bits to array", written == 19);
+    test_assert("Should have written 3 bytes to array", written == 3);
     test_assert("First byte of writeout", test[0] == 0xF0);
     test_assert("Second byte of writeout", test[1] == 0x0F);
     test_assert("Third byte of writeout", test[2] == 0b101);

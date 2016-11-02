@@ -16,7 +16,7 @@
  * Intialize a new bitcode
  */
 void bitcode_init(bitcode *bc) {
-    bc->array = calloc(sizeof(uchar), 1);
+    bc->array = calloc(sizeof(byte), 1);
     bc->total_bytes = 1;
     bc->length = 0;
 }
@@ -28,8 +28,8 @@ void bitcode_init(bitcode *bc) {
 void bitcode_copy(bitcode *src, bitcode *dest) {
     dest->total_bytes = src->total_bytes;
     dest->length = src->length;
-    dest->array = malloc(sizeof(uchar)*src->total_bytes);
-    memcpy(dest->array, src->array, sizeof(uchar)*src->total_bytes);
+    dest->array = malloc(sizeof(byte)*src->total_bytes);
+    memcpy(dest->array, src->array, sizeof(byte)*src->total_bytes);
 }
 
 /**
@@ -41,7 +41,7 @@ void grow_array_if_necessary(size_t growth, bitcode *bc){
         new_size *= 2;
     }
     if(new_size != bc->total_bytes) {
-        bc->array = realloc(bc->array, sizeof(uchar)*new_size);
+        bc->array = realloc(bc->array, sizeof(byte)*new_size);
         while(bc->total_bytes < new_size){
             bc->array[bc->total_bytes] = 0;
             bc->total_bytes++;
@@ -64,12 +64,12 @@ void bitcode_store_bit(bool bit, bitcode *bc) {
  * Write all the bits in the current code to an uchar array.
  * This expects the destinatio to be large enough.
  */
-void bitcode_write_all(uchar *dest, size_t* bits_written,const bitcode *bc) {
+void bitcode_write_all(byte *dest, size_t* bytes_written,const bitcode *bc) {
     size_t total = (bc->length-1)/8+1;
-    memcpy(dest, bc->array, sizeof(uchar)*total);
-    // bits_written can be NULL
-    if(bits_written){
-        *bits_written = bc->length;
+    memcpy(dest, bc->array, sizeof(byte)*total);
+    // bytes_written can be NULL
+    if(bytes_written){
+        *bytes_written = total;
     }
 }
 
@@ -126,7 +126,7 @@ void bitcode_clear_one(bitcode *bc) {
 /**
  * Store a whole byte (8 bits) at once.
  */
-void bitcode_store_byte(uchar byte, bitcode *bc) {
+void bitcode_store_byte(byte byte, bitcode *bc) {
     grow_array_if_necessary(8,bc);
     size_t current_bit = CURRENT_BIT(bc);
     size_t current_byte = CURRENT_BYTE(bc);

@@ -23,6 +23,9 @@ void graceful_exit_printf(const char *msg,...) {
 
 void parse_arguments(arguments* args, int argc, char **argv) {
 
+    args->bw_transform = true;
+    args->block_size   = (args->bw_transform ? (uint16_t) 8192 : (uint16_t) 32767);
+
     // first argument is the name of the executable
     if(argc != (ARG_COUNT + 1)) {
         graceful_exit_printf("Expected %i arguments, but got %i\n", ARG_COUNT, argc - 1);

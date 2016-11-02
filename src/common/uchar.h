@@ -5,15 +5,15 @@
 #ifndef DA3_PROJECT_UCHAR_H
 #define DA3_PROJECT_UCHAR_H
 
+#include <stdint.h>
+
 /*
- * Typing uchar is shorten.
- * This is used in places where the sign of character is of importance.
- * (The C standard does not say whether char must be signed or unsigned)
+ * A simple byte typedef.
  */
 
-typedef unsigned char uchar;
+typedef uint8_t byte;
 
-#define UCHAR(chr) (uchar)(chr)
-#define UCHAR_PTR(str) (uchar*)(str)
+#define BYTE(chr) (byte)(chr)
+#define BYTE_PTR(str) (byte*)(str)
 
 #endif //DA3_PROJECT_UCHAR_H

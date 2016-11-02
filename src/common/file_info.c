@@ -3,6 +3,8 @@
 //
 
 #include <malloc.h>
+#include <bits/time.h>
+#include <time.h>
 #include "file_info.h"
 
 
@@ -15,21 +17,39 @@ size_t file_size(FILE *file) {
     return size;
 }
 
-const char* file_sizes[] = {"B", "KB", "MB", "GB", "TB", "PB"};
+const char* file_sizes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB"};
 
 char *human_readable_size(size_t size) {
-    // number = 4 chars
+    // number = 6 chars
     // space  = 1 char
     // suffix = 2 chars
     // null   = 1 char
     //       + ---
     //          8 chars
-    char* resultstr = calloc(8, sizeof(char));
+    char* resultstr = calloc(10, sizeof(char));
     size_t i = 0;
-    while(size < 1024){
+    double floatsize = (double) size;
+    while(floatsize > 1024){
         i++;
-        size /= 1024;
+        floatsize /= 1024;
     }
-    sprintf(resultstr, "%lu %s",size, file_sizes[i]);
+    sprintf(resultstr, "%.2f %s",floatsize, file_sizes[i]);
     return resultstr;
+}
+
+void print_compression_stats(size_t src_size, size_t dest_size, double time) {
+    char* human_readable_src = human_readable_size(src_size);
+    char* human_readable_dest = human_readable_size(dest_size);
+    char* human_readable_speed = human_readable_size((size_t)(src_size/time));
+
+
+    printf("Done: %s => %s\n", human_readable_src, human_readable_dest);
+    printf("%.2f%% compression in %f seconds. %s/s\n",
+           ((double)dest_size*100)/(double)src_size,
+            time,
+            human_readable_speed);
+
+    free(human_readable_speed);
+    free(human_readable_src);
+    free(human_readable_dest);
 }
