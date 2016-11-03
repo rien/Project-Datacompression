@@ -21,8 +21,8 @@ byte circular_string_first(const circular_string *cstr) {
  * this method can be used to sort an array of pointers to circular strings.
  */
 int circular_string_compare(const void* a, const void* b) {
-    circular_string* cstr_a = *((circular_string**) a);
-    circular_string* cstr_b = *((circular_string**) b);
+    circular_string* cstr_a = (circular_string*) a;
+    circular_string* cstr_b = (circular_string*) b;
     size_t i = 0;
     int diff;
     assert(cstr_a->length == cstr_b->length);

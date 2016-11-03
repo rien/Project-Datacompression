@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(DA3_project)
 
-set(CMAKE_C_FLAGS "-std=c99 -lm -Wall")
+set(CMAKE_C_FLAGS "-std=c99 -O3 -lm -Wall")
 
 set(builddir "${CMAKE_CURRENT_SOURCE_DIR}/out/")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${builddir}")

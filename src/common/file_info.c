@@ -37,15 +37,16 @@ char *human_readable_size(size_t size) {
     return resultstr;
 }
 
-void print_compression_stats(size_t src_size, size_t dest_size, double time) {
+void print_stats(size_t src_size, size_t dest_size, double time, char *action) {
     char* human_readable_src = human_readable_size(src_size);
     char* human_readable_dest = human_readable_size(dest_size);
     char* human_readable_speed = human_readable_size((size_t)(src_size/time));
 
 
     printf("Done: %s => %s\n", human_readable_src, human_readable_dest);
-    printf("%.2f%% compression in %f seconds. %s/s\n",
+    printf("%.2f%% %s in %f seconds. %s/s\n",
            ((double)dest_size*100)/(double)src_size,
+            action,
             time,
             human_readable_speed);
 

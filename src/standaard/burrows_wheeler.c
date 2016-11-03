@@ -3,6 +3,7 @@
 //
 
 #include <stdlib.h>
+#include <memory.h>
 #include "burrows_wheeler.h"
 #include "../common/uchar.h"
 #include "circular_string.h"
@@ -11,21 +12,20 @@ void burrows_wheeler_encode(byte block[], size_t length, byte output[], size_t* 
 
     circular_string rows[length];
 
-    circular_string* rows_sorted[length];
 
     for (size_t i = 0; i < length; ++i) {
         rows[i].base = block;
         rows[i].length = length;
         rows[i].offset = i;
-        rows_sorted[i] = &rows[i];
     }
 
-    qsort(rows_sorted, length, sizeof(circular_string*), circular_string_compare);
+    qsort(rows, length, sizeof(circular_string), circular_string_compare);
 
     // write the last row to the output
     for (size_t i = 0; i < length; ++i) {
-        output[i] = circular_string_last(rows_sorted[i]);
-        if (rows_sorted[i]->offset == 0) {
+        output[i] = circular_string_last(&rows[i]);
+        // because the last character is offset - 1
+        if (rows[i].offset == 1) {
             *start_pos = i;
         }
     }
@@ -38,16 +38,23 @@ int sort_indices(const void* a, const void* b, void* arg){
     return string[index_a] - string[index_b];
 }
 
-void burrows_wheeler_decode(byte *block, size_t length, byte *output, size_t start_pos) {
-    circular_string first_row[length];
+int compare_byte_ptr(const void *a, const void *b){
+    return (**(byte**) a) - (**(byte**) b);
+}
+
+void burrows_wheeler_decode(byte *block, size_t length, byte *output, size_t start_pos){
+    byte* sorted[length];
+
     for (size_t i = 0; i < length; ++i) {
-        first_row[i].length = 1;
-        first_row[i].base = output;
-        first_row[i].offset = i;
+        sorted[i] = &block[i];
     }
-    //qsort(first_row, length, sizeof())
 
+    qsort(sorted, length, sizeof(byte *), compare_byte_ptr);
 
-
+    size_t next = start_pos;
+    for (size_t i = 0; i < length; ++i) {
+        output[i] = block[next];
+        next = sorted[next] - block; // calculate the offset
+    }
 }
 

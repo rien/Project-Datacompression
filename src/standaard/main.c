@@ -6,6 +6,7 @@
 #include "../common/check_args.h"
 #include "../common/constanst.h"
 #include "encoder.h"
+#include "decoder.h"
 
 char* program_name = "standaard";
 
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]) {
         // Both encode() and decode() access the arguments as external variables
         case COMPRESS: encode();
             break;
-        case DECOMPRESS:; //TODO
+        case DECOMPRESS: decode();
             break;
     }
 }

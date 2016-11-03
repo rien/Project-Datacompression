@@ -149,7 +149,7 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
     // this calculates the huffman tree and the bitcodes
     huffman_init(input, length, &hd);
 
-    unsigned short int tree_code_length = (unsigned short int) hd.tree_code.length;
+    uint16_t  tree_code_length = (uint16_t) hd.tree_code.length;
 
     // write the length of the tree code (first the lower byte, then the higher byte)
     bitcode_store_byte((byte) tree_code_length, &output_code);
@@ -166,7 +166,13 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
     // write the bitcode to the buffer
     bitcode_write_all(output, output_length, &output_code);
 
-
     huffman_free_dictionary(&hd);
     bitcode_free(&output_code);
+}
+
+void huffman_decode(byte *input, size_t length, byte *output, size_t *output_length) {
+    huffman_dictionary hd;
+
+    uint16_t tree_code_length;
+
 }

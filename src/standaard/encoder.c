@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <time.h>
 #include <limits.h>
+#include <assert.h>
 #include "encoder.h"
 #include "../common/constanst.h"
 #include "circular_string.h"
@@ -14,8 +15,32 @@
 #include "../common/file_info.h"
 #include "../common/check_args.h"
 
+/**
+ * File header
+ *
+ * - 10 bytes: file signature
+ *      -> 'DA3ZIP-BWT' if the burrows wheeler transformation with move-to-front was applied
+ *      -> 'DA3ZIP-HUF' if only huffman encoding was used
+ * - 2 bytes: block size, encoded as a 16-bit unsigned integer
+ *
+ * Block header
+ *
+ * - if bwt: 2 bytes: starting index of the bwt
+ * - 2 bytes: size of the next encoded data (excluding possible bwt starting index)
+ *
+ * Data:
+ * - 2 bytes: size of the encoded huffman tree
+ * - huffman tree
+ * - huffman encoded data
+ *
+ */
 void encode() {
     clock_t start_time = clock();                               // start timing
+
+    char* sig = args.bw_transform ? "DA3ZIP-BWT" : "DA3ZIP-HUF";        // file sig
+
+    fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args.destination);       // signature
+    fwrite(&args.block_size, sizeof(uint16_t), 1, args.destination);    // block size
 
     byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers on the stack: faster than on the heap
     byte buffer2[MAX_BLOCK_SIZE];
@@ -27,26 +52,33 @@ void encode() {
     size_t blocks = ((input_file_size-1)/args.block_size) + 1;  // blocks to process
     size_t current_block = 0;
 
+    fwrite(&blocks, sizeof(uint16_t), 1, args.destination);     // amount of blocks
+
     while((a_read = fread(buffer1, sizeof(byte), args.block_size, args.source)) > 0){
         current_block++;
 
-        // show progress
+        // Show progress
         printf("%lu%% - %lu/%lu\r\n",(current_block*100)/blocks, current_block, blocks);
 
-        // burrows wheeler + move to front
+        // Burrows wheeler + move to front
         if(args.bw_transform){
             burrows_wheeler_encode(buffer1, a_read, buffer2, &t_start);
             move_to_front_encode(buffer2, buffer1, a_read);
+            fwrite(&t_start, sizeof(uint16_t), 1, args.destination);
         }
 
-        // actual compression
+        // Actual compression
         huffman_encode(buffer1, a_read, buffer2, &a_encoded);
+        assert(a_encoded < MAX_BLOCK_SIZE);
 
-        // writeout
+        // Write the amount of encoded bytes as a 16 bit unsigned integer
+        fwrite(&a_encoded, sizeof(uint16_t), 1, args.destination);
+
+        // Write encoded data
         fwrite(buffer2, sizeof(byte), a_encoded, args.destination);
     }
 
-    // error handling
+    // Error handling
     if(ferror(args.source)){
         graceful_exit_printf("An error occurred while reading the input file.");
     }
@@ -54,8 +86,8 @@ void encode() {
         graceful_exit_printf("An error occurred while writing to the output file.");
     }
 
-    // show off how good we are
+    // Show off how good we are
     clock_t stop_time = clock();
     size_t output_file_size = file_size(args.destination);
-    print_compression_stats(input_file_size, output_file_size, (double)(stop_time - start_time)/CLOCKS_PER_SEC);
+    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
 }
