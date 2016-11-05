@@ -34,11 +34,15 @@ typedef struct {
     bitcode tree_code;
 } huffman_dictionary;
 
-void huffman_init(byte input[], size_t length, huffman_dictionary *hd);
+void huffman_init(huffman_dictionary *hd);
 
 void huffman_free_dictionary(huffman_dictionary* hd);
 
-void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
+void huffman_build_dictionary(huffman_dictionary *hd);
+
+void huffman_build_tree(byte *input, size_t length, huffman_dictionary *hd);
+
+        void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
 
 void huffman_decode(byte input[], size_t length, byte output[], size_t* output_length);
 

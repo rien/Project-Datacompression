@@ -94,6 +94,60 @@ void test_store_byte(){
     test_assert("Test second byte", bc.array[1] == 0b01111111);
 }
 
+void test_read(){
+    bitcode bc;
+    bitcode_init(&bc);
+
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+    bitcode_store_byte(0b10101010, &bc);
+
+
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+
+
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0b01010101);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0b10101010);
+
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == false);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0b01010101);
+
+
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0b10101010);
+}
+
+void test_from_array(){
+    bitcode bc;
+    byte array[] = {0xFF, 0x00, 0xF0, 0x0F};
+    bitcode_from_array(array, 4, &bc);
+
+    bitcode_store_bit(true, &bc);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0xFF);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0x00);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0xF0);
+    test_assert("Read byte", bitcode_consume_byte(&bc) == 0x0F);
+    test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+}
+
 void test_clear(){
     bitcode bc;
     bitcode_init(&bc);
@@ -305,6 +359,8 @@ void test_append(){
 void test_bitcode(){
     test_store();
     test_store_byte();
+    test_read();
+    test_from_array();
     test_clear();
     test_clear_one();
     test_append();

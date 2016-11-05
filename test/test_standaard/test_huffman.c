@@ -14,7 +14,7 @@ void test_huffman(){
     size_t input_length = strlen((char*)input);
 
     huffman_dictionary hd;
-    huffman_init(input, input_length, &hd);
+    huffman_init(&hd);
     /*
      * The tree should look like this:
      *
@@ -26,7 +26,10 @@ void test_huffman(){
      *   -----   |   -----
      *   A   C   E   D   B
      *   6   6   5   2   1
+     *
+     *  Dictionary code: 001A1C01E01D1B
      */
+    huffman_build_tree(input, input_length, &hd);
     test_assert("A's frequency", hd.codes['A'].occurrences == 6);
     test_assert("B's frequency", hd.codes['B'].occurrences == 1);
     test_assert("C's frequency", hd.codes['C'].occurrences == 6);
@@ -43,6 +46,7 @@ void test_huffman(){
     test_assert("Root right right left char", hd.root->right->right->right->codeword->word == 'B');
     test_assert("Root right right right char", hd.root->right->right->left->codeword->word == 'D');
 
+    huffman_build_dictionary(&hd);
     test_assert("A's code", hd.codes['A'].bitcode.array[0] == 0b00);
     test_assert("A's length", hd.codes['A'].bitcode.length == 2);
     test_assert("B's code", hd.codes['B'].bitcode.array[0] == 0b111);

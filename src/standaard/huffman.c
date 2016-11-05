@@ -24,7 +24,9 @@ void huffman_tree_free(huffman_node *root) {
 }
 
 void huffman_free_dictionary(huffman_dictionary *dict) {
-    huffman_tree_free(dict->root);
+    if(dict->root){
+        huffman_tree_free(dict->root);
+    }
     bitcode_free(&dict->tree_code);
 }
 
@@ -122,9 +124,9 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
 }
 
 /**
- * Initialize the huffman dictionary by setting.
+ * Initialize the huffman dictionary by setting default values.
  */
-void huffman_init(byte *input, size_t length, huffman_dictionary *hd) {
+void huffman_init(huffman_dictionary *hd) {
     for (size_t i = 0; i < 256; ++i) {
         huffman_codeword* hdc = &hd->codes[i];
         hdc->word = BYTE(i);
@@ -137,25 +139,58 @@ void huffman_init(byte *input, size_t length, huffman_dictionary *hd) {
     }
     hd->root = NULL;
     bitcode_init(&hd->tree_code);
-    huffman_build_tree(input, length, hd);
-    huffman_build_dictionary(hd);
+}
+
+
+void huffman_reconstruct_tree(bitcode* input_bc, size_t tree_code_length, huffman_dictionary hd){
+    bitcode bc;
+    bitcode_init(&bc);
+
+    while (tree_code_length > 0){
+        tree_code_length--;
+        if(bitcode_consume_bit(input_bc)){
+            // 1: this is a leaf, so this bit should be followed by the encoded byte
+
+            byte word = bitcode_consume_byte(&bc);
+            tree_code_length -= 8;
+
+            bitcode_copy(&bc, &hd.codes[word].bitcode);
+
+            if(bitcode_read_last_bit(&bc)){
+                // this was a right child: go up
+
+            } else {
+                // this was a left child
+
+            }
+        } else{
+            // 0: this is a node
+
+
+        }
+
+    }
+
 }
 
 void huffman_encode(byte *input, size_t length, byte *output, size_t *output_length) {
     huffman_dictionary hd;
+    huffman_init(&hd);
+
+
     bitcode output_code;
     bitcode_init(&output_code);
 
-    // this calculates the huffman tree and the bitcodes
-    huffman_init(input, length, &hd);
-
-    uint16_t  tree_code_length = (uint16_t) hd.tree_code.length;
+    // calculate the huffman tree and the bitcodes
+    huffman_build_tree(input, length, &hd);
+    huffman_build_dictionary(&hd);
 
     // write the length of the tree code (first the lower byte, then the higher byte)
+    uint16_t  tree_code_length = (uint16_t) hd.tree_code.length;
     bitcode_store_byte((byte) tree_code_length, &output_code);
     bitcode_store_byte((byte) tree_code_length << 8, &output_code);
 
-    // tree code itself
+    // store the tree code itself
     bitcode_append(&hd.tree_code, &output_code);
 
     // construct the encoded output
@@ -172,7 +207,16 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
 
 void huffman_decode(byte *input, size_t length, byte *output, size_t *output_length) {
     huffman_dictionary hd;
+    huffman_init(NULL);
 
-    uint16_t tree_code_length;
+    bitcode input_bc;
+    bitcode_from_array(input, length, &input_bc);
+
+    uint16_t tree_code_length = 0;
+    tree_code_length |= bitcode_consume_byte(&input_bc);
+    tree_code_length |= bitcode_consume_byte(&input_bc) << 8;
+
+
+
 
 }

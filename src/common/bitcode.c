@@ -12,13 +12,23 @@
 #define CURRENT_BYTE(bc) (bc->length / 8)
 
 
+
 /**
  * Intialize a new bitcode
  */
 void bitcode_init(bitcode *bc) {
     bc->array = calloc(sizeof(byte), 1);
     bc->total_bytes = 1;
+    bc->cursor = 0;
     bc->length = 0;
+}
+
+void bitcode_from_array(byte *data, size_t length, bitcode *bc) {
+    bc->array = malloc(sizeof(byte)* length);
+    memcpy(bc->array, data, sizeof(byte)*length);
+    bc->total_bytes = length;
+    bc->cursor = 0;
+    bc->length = length*8;
 }
 
 /**
@@ -126,13 +136,13 @@ void bitcode_clear_one(bitcode *bc) {
 /**
  * Store a whole byte (8 bits) at once.
  */
-void bitcode_store_byte(byte byte, bitcode *bc) {
+void bitcode_store_byte(byte data, bitcode *bc) {
     grow_array_if_necessary(8,bc);
     size_t current_bit = CURRENT_BIT(bc);
     size_t current_byte = CURRENT_BYTE(bc);
 
-    bc->array[current_byte]   |= (byte << current_bit);     // lower part
-    bc->array[current_byte+1] |= (byte >> (8-current_bit)); // upper part
+    bc->array[current_byte]   |= (data << current_bit);     // lower part
+    bc->array[current_byte+1] |= (data >> (8-current_bit)); // upper part
 
     bc->length += 8;
 }
@@ -169,7 +179,30 @@ void bitcode_append(const bitcode *src, bitcode *dest) {
     dest->length += src->length;
 }
 
+bool bitcode_consume_bit(bitcode *bc) {
+    assert(bc->cursor < bc->length);
+    size_t n = bc->cursor;
+    bc->cursor++;
+    return (bool) (0 != (bc->array[n / 8] & (1 << (n % 8))));
+}
 
+byte bitcode_consume_byte(bitcode *bc) {
+    assert((bc->cursor + 8) < bc->length);
+    size_t n = bc->cursor;
+    bc->cursor += 8;
+    byte result = 0;
+    size_t curr_byte = n / 8;
+    size_t curr_bit = n % 8;
+    result |= bc->array[curr_byte] >> (curr_bit);
+    result |= bc->array[curr_byte + 1] << (8 - curr_bit);
+    return result;
+}
+
+bool bitcode_read_last_bit(bitcode *bc) {
+    assert(bc->length >= 1);
+    size_t n = bc->length - 1;
+    return (bool) (0 != (bc->array[n / 8] & (1 << (n % 8))));
+}
 
 
 #undef CURRENT_BIT
