@@ -8,8 +8,8 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "../common/uchar.h"
 #include "../common/bitcode.h"
+#include "../common/common.h"
 
 typedef struct {
     byte word;
@@ -42,9 +42,11 @@ void huffman_build_dictionary(huffman_dictionary *hd);
 
 void huffman_build_tree(byte *input, size_t length, huffman_dictionary *hd);
 
-        void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
+huffman_node* huffman_reconstruct_tree(bitcode* input_bc, huffman_dictionary* hd);
 
-void huffman_decode(byte input[], size_t length, byte output[], size_t* output_length);
+void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
+
+void huffman_decode(byte input[], size_t length, size_t a_encoded, byte output[], size_t* output_length);
 
 
 #endif //DA3_PROJECT_HUFFMAN_H

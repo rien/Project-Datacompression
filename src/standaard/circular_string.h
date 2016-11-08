@@ -6,7 +6,7 @@
 #define DA3_PROJECT_CIRCULAR_STRING_H
 
 #include <stddef.h>
-#include "../common/uchar.h"
+#include "../common/common.h"
 
 typedef struct {
     byte* base;

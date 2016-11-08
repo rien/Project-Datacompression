@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include "burrows_wheeler.h"
-#include "../common/uchar.h"
 #include "circular_string.h"
 
 void burrows_wheeler_encode(byte block[], size_t length, byte output[], size_t* start_pos) {

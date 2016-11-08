@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <assert.h>
 #include "encoder.h"
-#include "../common/constanst.h"
+#include "../common/common.h"
 #include "circular_string.h"
 #include "burrows_wheeler.h"
 #include "move_to_front.h"
@@ -21,15 +21,16 @@
  * - 10 bytes: file signature
  *      -> 'DA3ZIP-BWT' if the burrows wheeler transformation with move-to-front was applied
  *      -> 'DA3ZIP-HUF' if only huffman encoding was used
- * - 2 bytes: block size, encoded as a 16-bit unsigned integer
+ * - 4 bytes: amount of blocks
+ *    (this restricts the maximum file size to encode to around 35 TB, which should be just enough)
  *
  * Block header
  *
  * - if bwt: 2 bytes: starting index of the bwt
+ * - 2 bytes: amount of encoded bytes (<= block size)
  * - 2 bytes: size of the next encoded data (excluding possible bwt starting index)
  *
  * Data:
- * - 2 bytes: size of the encoded huffman tree
  * - huffman tree
  * - huffman encoded data
  *
@@ -40,7 +41,6 @@ void encode() {
     char* sig = args.bw_transform ? "DA3ZIP-BWT" : "DA3ZIP-HUF";        // file sig
 
     fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args.destination);       // signature
-    fwrite(&args.block_size, sizeof(uint16_t), 1, args.destination);    // block size
 
     byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers on the stack: faster than on the heap
     byte buffer2[MAX_BLOCK_SIZE];
@@ -49,10 +49,10 @@ void encode() {
     size_t a_encoded;                                           // amount of bytes to be written
     size_t t_start;                                             // starting position of the bwt-transformed string
     size_t input_file_size = file_size(args.source);            // file size of the source
-    size_t blocks = ((input_file_size-1)/args.block_size) + 1;  // blocks to process
+    size_t blocks = CEIL_DIVISION(input_file_size, args.block_size);  // blocks to process
     size_t current_block = 0;
 
-    fwrite(&blocks, sizeof(uint16_t), 1, args.destination);     // amount of blocks
+    fwrite(&blocks, sizeof(uint32_t), 1, args.destination);     // amount of blocks
 
     while((a_read = fread(buffer1, sizeof(byte), args.block_size, args.source)) > 0){
         current_block++;
@@ -70,6 +70,9 @@ void encode() {
         // Actual compression
         huffman_encode(buffer1, a_read, buffer2, &a_encoded);
         assert(a_encoded < MAX_BLOCK_SIZE);
+
+        // Original amount of bytes
+        fwrite(&a_read, sizeof(uint16_t), 1, args.destination);
 
         // Write the amount of encoded bytes as a 16 bit unsigned integer
         fwrite(&a_encoded, sizeof(uint16_t), 1, args.destination);

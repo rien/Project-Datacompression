@@ -4,7 +4,6 @@
 
 #include <memory.h>
 #include "move_to_front.h"
-#include "../common/uchar.h"
 #include "stdint.h"
 
 #define TABLE_SIZE 255

@@ -4,7 +4,6 @@
 
 #include <stddef.h>
 #include "circular_string.h"
-#include "../common/uchar.h"
 
 #ifndef DA3_PROJECT_BURROWS_WHEELER_H
 #define DA3_PROJECT_BURROWS_WHEELER_H

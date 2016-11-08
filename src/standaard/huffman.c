@@ -112,9 +112,9 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
         bitcode_store_bit(true, &hd->tree_code);
         bitcode_store_byte(hd->root->codeword->word, &hd->tree_code);
 
-        //code is just 0
+        //code is just 1
         bitcode_init(&hd->root->codeword->bitcode);
-        bitcode_store_bit(false, &hd->root->codeword->bitcode);
+        bitcode_store_bit(true, &hd->root->codeword->bitcode);
     } else {
         bitcode_store_bit(false, &hd->tree_code);
         traverse_tree(hd->root->left, &bc, &hd->tree_code, false);
@@ -129,54 +129,41 @@ void huffman_build_dictionary(huffman_dictionary *hd) {
 void huffman_init(huffman_dictionary *hd) {
     for (size_t i = 0; i < 256; ++i) {
         huffman_codeword* hdc = &hd->codes[i];
-        hdc->word = BYTE(i);
+        hdc->word = (byte)i;
         hdc->occurrences = 0;
 
         huffman_node* hdl = &hd->leaves[i];
         hdl->codeword = hdc;
         hdl->left = NULL;
         hdl->right = NULL;
+        hdl->sum = 0;
     }
     hd->root = NULL;
     bitcode_init(&hd->tree_code);
 }
 
-
-void huffman_reconstruct_tree(bitcode* input_bc, size_t tree_code_length, huffman_dictionary hd){
-    bitcode bc;
-    bitcode_init(&bc);
-
-    while (tree_code_length > 0){
-        tree_code_length--;
-        if(bitcode_consume_bit(input_bc)){
-            // 1: this is a leaf, so this bit should be followed by the encoded byte
-
-            byte word = bitcode_consume_byte(&bc);
-            tree_code_length -= 8;
-
-            bitcode_copy(&bc, &hd.codes[word].bitcode);
-
-            if(bitcode_read_last_bit(&bc)){
-                // this was a right child: go up
-
-            } else {
-                // this was a left child
-
-            }
-        } else{
-            // 0: this is a node
-
-
-        }
-
+huffman_node *huffman_reconstruct_tree(bitcode *input_bc, huffman_dictionary *hd) {
+    huffman_node* node;
+    if(bitcode_consume_bit(input_bc)){
+        // 1: we have a leaf, next byte is the word
+        byte word = bitcode_consume_byte(input_bc);
+        node = &hd->leaves[word];
+    } else {
+        // 0: we have a node, create one and go deeper
+        node = malloc(sizeof(huffman_node));
+        node->codeword = NULL;
+        node->left = huffman_reconstruct_tree(input_bc, hd);
+        node->right = huffman_reconstruct_tree(input_bc, hd);
     }
-
+    return node;
 }
+
+
+
 
 void huffman_encode(byte *input, size_t length, byte *output, size_t *output_length) {
     huffman_dictionary hd;
     huffman_init(&hd);
-
 
     bitcode output_code;
     bitcode_init(&output_code);
@@ -185,12 +172,7 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
     huffman_build_tree(input, length, &hd);
     huffman_build_dictionary(&hd);
 
-    // write the length of the tree code (first the lower byte, then the higher byte)
-    uint16_t  tree_code_length = (uint16_t) hd.tree_code.length;
-    bitcode_store_byte((byte) tree_code_length, &output_code);
-    bitcode_store_byte((byte) tree_code_length << 8, &output_code);
-
-    // store the tree code itself
+    // store the tree code
     bitcode_append(&hd.tree_code, &output_code);
 
     // construct the encoded output
@@ -205,18 +187,38 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
     bitcode_free(&output_code);
 }
 
-void huffman_decode(byte *input, size_t length, byte *output, size_t *output_length) {
+void huffman_decode(byte *input, size_t length, size_t a_encoded, byte *output, size_t *output_length) {
     huffman_dictionary hd;
-    huffman_init(NULL);
+    huffman_init(&hd);
 
     bitcode input_bc;
     bitcode_from_array(input, length, &input_bc);
 
-    uint16_t tree_code_length = 0;
-    tree_code_length |= bitcode_consume_byte(&input_bc);
-    tree_code_length |= bitcode_consume_byte(&input_bc) << 8;
+    hd.root = huffman_reconstruct_tree(&input_bc, &hd);
+
+    size_t index = 0;
+
+    if(hd.root->codeword) {
+        byte word = hd.root->codeword->word;
+        while(bitcode_consume_bit(&input_bc)){
+            output[index++] = word;
+        }
+    } else {
+        while(index < a_encoded){
+
+            huffman_node* curr_node = hd.root;
+            while(curr_node->codeword == NULL){
+                if(bitcode_consume_bit(&input_bc)){
+                    curr_node = curr_node->right;
+                } else {
+                    curr_node = curr_node->left;
+                }
+            }
+            output[index++] = curr_node->codeword->word;
+        }
+    }
 
 
 
-
+    *output_length = index;
 }

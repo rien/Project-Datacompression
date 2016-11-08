@@ -6,12 +6,12 @@
 #include <memory.h>
 #include <assert.h>
 #include "decoder.h"
-#include "../common/constanst.h"
-#include "../common/uchar.h"
+#include "../common/common.h"
 #include "burrows_wheeler.h"
 #include "move_to_front.h"
 #include "../common/file_info.h"
 #include "huffman.h"
+#include "../common/check_args.h"
 
 void decode() {
     clock_t start_time = clock();
@@ -19,6 +19,13 @@ void decode() {
 
     byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers on the stack: faster than on the heap
     byte buffer2[MAX_BLOCK_SIZE];
+
+    size_t a_read = 0;
+    uint16_t a_encoded = 0;
+    uint16_t encoded_length = 0;
+    uint16_t bwt_index = 0;
+    size_t input_file_size = file_size(args.source);
+    size_t a_decoded;
 
     char signature[FILE_SIG_LENGTH];
 
@@ -36,36 +43,40 @@ void decode() {
         graceful_exit_printf("Wrong file signature. This is not a DA3ZIP file.");
     }
 
-    uint16_t block_size;
-    fread(&block_size, sizeof(uint16_t), 1, args.source);
+    size_t a_blocks = 0;
+    size_t current_block = 0;
 
-    size_t a_read = 0;
-    uint16_t a_encoded = 0;
-    uint16_t bwt_index = 0;
-    size_t input_file_size = file_size(args.source);
-    size_t a_decoded;
+    fread(&a_blocks, sizeof(uint32_t), 1, args.source);
 
-    while (1){
+    while (current_block < a_blocks){
+        current_block++;
+
         if(feof(args.source)){
             break;
         }
 
         // Show progress
-        printf("Decoding %lu%%", ftell(args.source)*100/input_file_size);
+        printf("Decoding %lu%%\n", ftell(args.source)*100/input_file_size);
 
 
         // Block header
         if(bwt){
-            fread(&bwt_index, sizeof(uint16_t), 1, args.source);
+            fread(&bwt_index, sizeof(uint16_t), 1, args.source);    // BWT index
         }
-        fread(&a_encoded, sizeof(uint16_t), 1, args.source);
+        fread(&a_encoded, sizeof(uint16_t), 1, args.source);        // Amount of encoded bytes
+        fread(&encoded_length, sizeof(uint16_t), 1, args.source);   // Length of the current block
 
         // Read data
-        a_read = fread(buffer1, sizeof(byte), a_encoded, args.source);
-        if(a_read < a_encoded){
-            printf("Stopped reading unexpectedly. Help.");
+        a_read = fread(buffer1, sizeof(byte), encoded_length, args.source);
+        if(a_read < encoded_length){
+            printf("Stopped reading unexpectedly. Help.\n");
             break;
         }
+
+        // Decompression
+        huffman_decode(buffer1, encoded_length, a_encoded, buffer2, &a_decoded);
+
+        assert(a_decoded == a_encoded);
 
         // Burrows-wheeler transform
         if(bwt){
@@ -73,10 +84,6 @@ void decode() {
             move_to_front_decode(buffer2, buffer1, a_encoded);
         }
 
-        // Decompression
-        huffman_decode(buffer1, a_encoded, buffer2, &a_decoded);
-
-        assert(a_decoded == block_size);
 
         // Write decoded data
         fwrite(buffer2, sizeof(byte), a_decoded, args.destination);

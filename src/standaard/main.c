@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "../common/check_args.h"
-#include "../common/constanst.h"
+#include "../common/common.h"
 #include "encoder.h"
 #include "decoder.h"
 

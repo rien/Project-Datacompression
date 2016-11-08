@@ -7,8 +7,7 @@
 #include "../../src/standaard/huffman.h"
 #include "../../src/common/bitcode.h"
 
-void test_huffman(){
-
+void test_huffman_encode(){
     byte buffer[BLOCK_SIZE];
     byte* input = BYTE_PTR("AAAAAABCCCCCCDDEEEEE");
     size_t input_length = strlen((char*)input);
@@ -66,7 +65,7 @@ void test_huffman(){
     // E    01000101
     // Dictionary code: 001A1C01E01D1B
     test_assert("Tree code length", hd.tree_code.length == 49);
-    test_assert("Tree code 0", hd.tree_code.array[0] == 0b00001100); // 01A
+    test_assert("Tree code 0", hd.tree_code.array[0] == 0b00001100); //01A
     test_assert("Tree code 1", hd.tree_code.array[1] == 0b00111010); //A1C
     test_assert("Tree code 2", hd.tree_code.array[2] == 0b01100100); //C01E
     test_assert("Tree code 3", hd.tree_code.array[3] == 0b10010001); //E01
@@ -79,17 +78,65 @@ void test_huffman(){
     size_t output_length;
     huffman_encode(input, input_length, buffer, &output_length);
 
-    test_assert("Tree code length",*(unsigned short int*)buffer == 49);
-    test_assert("Encoded tree 0", buffer[2] == 0b00001100);
-    test_assert("Encoded tree 1", buffer[3] == 0b00111010);
-    test_assert("Encoded tree 2", buffer[4] == 0b01100100);
-    test_assert("Encoded tree 3", buffer[5] == 0b10010001);
-    test_assert("Encoded tree 4", buffer[6] == 0b01000100);
-    test_assert("Encoded tree 5", buffer[7] == 0b10000101);
-    test_assert("Encoded tree 6", buffer[8] == 0b00000000);
-    test_assert("Encoded tree 7", buffer[9] == 0b11100000);
-    test_assert("Encoded tree 8", buffer[10] == 0b10101010);
-    test_assert("Encoded tree 9", buffer[11] == 0b10111010);
-    test_assert("Encoded tree 10", buffer[12] == 0b01010101);
-    test_assert("Encoded tree 11", buffer[13] == 0b0101);
+    test_assert("Encoded 0", buffer[0] == 0b00001100);
+    test_assert("Encoded 1", buffer[1] == 0b00111010);
+    test_assert("Encoded 2", buffer[2] == 0b01100100);
+    test_assert("Encoded 3", buffer[3] == 0b10010001);
+    test_assert("Encoded 4", buffer[4] == 0b01000100);
+    test_assert("Encoded 5", buffer[5] == 0b10000101);
+    test_assert("Encoded 6", buffer[6] == 0b00000000);
+    test_assert("Encoded 7", buffer[7] == 0b11100000);
+    test_assert("Encoded 8", buffer[8] == 0b10101010);
+    test_assert("Encoded 9", buffer[9] == 0b10111010);
+    test_assert("Encoded 10", buffer[10] == 0b01010101);
+    test_assert("Encoded 11", buffer[11] == 0b0101);
+}
+
+void test_huffman_decode(){
+    huffman_dictionary hd;
+    huffman_init(&hd);
+
+    bitcode tree_code;
+    bitcode_init(&tree_code);
+    bitcode_store_byte(0b00001100, &tree_code);
+    bitcode_store_byte(0b00111010, &tree_code);
+    bitcode_store_byte(0b01100100, &tree_code);
+    bitcode_store_byte(0b10010001, &tree_code);
+    bitcode_store_byte(0b01000100, &tree_code);
+    bitcode_store_byte(0b10000101, &tree_code);
+    bitcode_store_byte(0b0, &tree_code);
+    hd.root = huffman_reconstruct_tree(&tree_code, &hd);
+
+    test_assert("Root left left char", hd.root->left->left->codeword->word == 'A');
+    test_assert("Root left right char", hd.root->left->right->codeword->word == 'C');
+    test_assert("Root right left char", hd.root->right->left->codeword->word == 'E');
+    test_assert("Root right right left char", hd.root->right->right->right->codeword->word == 'B');
+    test_assert("Root right right right char", hd.root->right->right->left->codeword->word == 'D');
+    
+    byte data[] = { 0b00001100,
+                    0b00111010,
+                    0b01100100,
+                    0b10010001,
+                    0b01000100,
+                    0b10000101,
+                    0b00000000,
+                    0b11100000,
+                    0b10101010,
+                    0b10111010,
+                    0b01010101,
+                    0b0101 };
+
+    size_t output_length;
+    char output[20];
+    huffman_decode(data, 12, 20, (byte*)output, &output_length);
+
+    test_assert("Output length not correct", output_length == 20);
+    test_assert("Output string not correct", strncmp(output, "AAAAAABCCCCCCDDEEEEE", output_length) == 0);
+
+    huffman_free_dictionary(&hd);
+}
+
+void test_huffman(){
+    test_huffman_encode();
+    test_huffman_decode();
 }

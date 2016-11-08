@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <memory.h>
 #include "bitcode.h"
-#include "constanst.h"
+#include "common.h"
 
 #define CURRENT_BIT(bc) (bc->length % 8)
 #define CURRENT_BYTE(bc) (bc->length / 8)
@@ -203,7 +203,6 @@ bool bitcode_read_last_bit(bitcode *bc) {
     size_t n = bc->length - 1;
     return (bool) (0 != (bc->array[n / 8] & (1 << (n % 8))));
 }
-
 
 #undef CURRENT_BIT
 #undef CURRENT_BYTE

@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "uchar.h"
+#include "common.h"
 
 typedef struct {
     // array to store the bits
