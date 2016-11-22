@@ -12,6 +12,7 @@
 #define CURRENT_BYTE(bc) (bc->length / 8)
 
 
+//TODO: bitscan, zie pieter
 
 /**
  * Intialize a new bitcode

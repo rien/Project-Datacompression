@@ -23,10 +23,9 @@ typedef struct {
     FILE* destination;
     option_type option;
     uint16_t block_size;
-    bool bw_transform;
 } arguments;
 
-void graceful_exit_printf(const char *msg,...);
+void graceful_exit_printf(arguments* args, const char *msg,...);
 
 void parse_arguments(arguments* args, int argc, char* argv[]);
 

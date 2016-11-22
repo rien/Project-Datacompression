@@ -20,7 +20,7 @@ do { \
 
 #define summarize_tests do { \
     if (tests_failed == 0) { \
-        printf("\nALL TESTS PASSED\n\n", tests_run); \
+        printf("\nALL TESTS PASSED\n\n"); \
     } \
     printf("Summary: %d succeeded, %d failed, %d total", tests_run - tests_failed, tests_failed, tests_run); \
 } while (0)

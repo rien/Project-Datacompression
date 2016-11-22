@@ -4,15 +4,11 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "../common/check_args.h"
+#include "check_args.h"
 
 #ifndef DA3_PROJECT_ENCODER_H
 #define DA3_PROJECT_ENCODER_H
 
-extern arguments args;
-
-extern bool do_burrows_wheeler;
-
-void encode();
+void encode(arguments *args);
 
 #endif //DA3_PROJECT_ENCODER_H

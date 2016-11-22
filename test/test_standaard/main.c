@@ -9,16 +9,17 @@
 #include "test_priorityqueue.h"
 #include "test_bitcode.h"
 #include "test_huffman.h"
+#include "../test_common/common_tests.h"
 
 int tests_run = 0;
 int tests_failed = 0;
 
 int main(int argc, char **argv) {
+    test_common();
     test_circular_string();
     test_burrows_wheeler();
     test_move_to_front();
     test_priorityqueue();
-    test_bitcode();
     test_huffman();
     summarize_tests;
 }
