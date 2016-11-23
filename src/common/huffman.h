@@ -8,8 +8,8 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include "../common/bitcode.h"
-#include "../common/common.h"
+#include "bitcode.h"
+#include "common.h"
 
 typedef struct {
     byte word;

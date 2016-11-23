@@ -3,9 +3,9 @@
 //
 
 #include "test_priorityqueue.h"
-#include "../../src/standaard/huffman.h"
-#include "../../src/standaard/priorityqueue.h"
-#include "../test_common/testmacro.h"
+#include "../../src/common/huffman.h"
+#include "../../src/common/priorityqueue.h"
+#include "testmacro.h"
 
 void test_bulk_insert(){
     huffman_node hn[256];

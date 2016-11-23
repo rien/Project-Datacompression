@@ -8,29 +8,19 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${builddir}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${buildddir}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${builddir}")
 
-add_executable(standaard
-        src/standaard/main.c
-        src/common/check_args.h  src/common/check_args.c
-        src/common/encoder.h src/standaard/encoder.c
-        src/common/common.h
-        src/standaard/circular_string.h src/standaard/circular_string.c
-        src/standaard/burrows_wheeler.c src/standaard/burrows_wheeler.h
-        src/standaard/move_to_front.c src/standaard/move_to_front.h
-        src/standaard/priorityqueue.c src/standaard/priorityqueue.h
-        src/standaard/huffman.c src/standaard/huffman.h
-        src/common/bitcode.c src/common/bitcode.h
-        src/common/file_info.c src/common/file_info.h
-        src/standaard/decoder.c src/common/decoder.h)
+FILE(GLOB common src/common/*)
 
-add_executable(specifiek
-        src/specifiek/main.c
-        src/common/check_args.h src/common/check_args.c
-        src/common/common.h
-        src/common/bitcode.c src/common/bitcode.h
-        src/common/file_info.c src/common/file_info.h
-        src/specifiek/encoder.c
-        src/specifiek/decoder.c)
+FILE(GLOB standaard src/standaard/*)
+FILE(GLOB specifiek src/specifiek/*)
+FILE(GLOB test_common test/test_common/*)
+FILE(GLOB test_standaard test/test_standaard/*)
+FILE(GLOB test_specifiek test/test_specifiek/*)
 
-add_executable(test_standaard test/test_standaard/main.c test/test_common/testmacro.h test/test_standaard/test_circular_string.c test/test_standaard/test_circular_string.c test/test_standaard/test_circular_string.c test/test_standaard/test_circular_string.h src/standaard/circular_string.c src/standaard/circular_string.h test/test_standaard/test_burrows_wheeler.c test/test_standaard/test_burrows_wheeler.h src/standaard/burrows_wheeler.c src/standaard/burrows_wheeler.h test/test_standaard/test_move_to_front.c test/test_standaard/test_move_to_front.h src/standaard/move_to_front.c src/standaard/move_to_front.h src/standaard/priorityqueue.c src/standaard/priorityqueue.h src/standaard/huffman.c src/standaard/huffman.h test/test_standaard/test_priorityqueue.c test/test_standaard/test_priorityqueue.h src/common/bitcode.c src/common/bitcode.h test/test_standaard/test_bitcode.c test/test_standaard/test_bitcode.h test/test_standaard/test_huffman.c test/test_standaard/test_huffman.h src/common/file_info.c src/common/file_info.h test/test_common/common_tests.c test/test_common/common_tests.h)
-add_executable(test_specifiek test/test_specifiek/main.c test/test_common/testmacro.h src/common/bitcode.c src/common/bitcode.h src/common/file_info.c src/common/file_info.h src/specifiek/encoder.c src/specifiek/decoder.c test/test_common/common_tests.c test/test_common/common_tests.h)
+add_executable(standaard src/main_standaard.c ${standaard} ${common})
+
+add_executable(specifiek src/main_specifiek.c ${specifiek} ${common})
+
+add_executable(test_standaard ${standaard} ${common} ${test_common} ${test_standaard})
+
+add_executable(test_specifiek ${specifiek} ${common} ${test_common} ${test_specifiek})
 

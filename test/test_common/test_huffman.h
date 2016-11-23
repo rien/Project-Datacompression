@@ -6,8 +6,8 @@
 #define DA3_PROJECT_TEST_HUFFMAN_H
 
 #include <memory.h>
-#include "../../src/standaard/huffman.h"
-#include "../test_common/testmacro.h"
+#include "../../src/common/huffman.h"
+#include "testmacro.h"
 
 void test_huffman();
 

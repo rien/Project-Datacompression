@@ -6,10 +6,12 @@
 #include "test_circular_string.h"
 #include "test_burrows_wheeler.h"
 #include "test_move_to_front.h"
-#include "test_priorityqueue.h"
-#include "test_bitcode.h"
-#include "test_huffman.h"
+#include "../test_common/test_priorityqueue.h"
+#include "../test_common/test_bitcode.h"
+#include "../test_common/test_huffman.h"
 #include "../test_common/common_tests.h"
+
+char* program_name = "test_standaard";
 
 int tests_run = 0;
 int tests_failed = 0;

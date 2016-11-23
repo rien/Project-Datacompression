@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../common/check_args.h"
-#include "../common/decoder.h"
-#include "../common/encoder.h"
+#include <stdbool.h>
 
-char* program_name = "specifiek";
+#include "common/check_args.h"
+#include "common/common.h"
+#include "common/encoder.h"
+#include "common/decoder.h"
+
+char* program_name = "standaard";
 
 int main(int argc, char* argv[]) {
     arguments args;
-
     parse_arguments(&args, argc, argv);
 
     switch (args.option){
@@ -19,5 +21,4 @@ int main(int argc, char* argv[]) {
         case DECOMPRESS: decode(&args);
             break;
     }
-    return 0;
 }

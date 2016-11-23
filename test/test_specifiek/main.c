@@ -5,6 +5,8 @@
 #include "../test_common/testmacro.h"
 #include "../test_common/common_tests.h"
 
+char* program_name = "test_specifiek";
+
 int tests_run = 0;
 int tests_failed = 0;
 

@@ -4,7 +4,7 @@
 
 #include "test_bitcode.h"
 #include "../../src/common/bitcode.h"
-#include "../test_common/testmacro.h"
+#include "testmacro.h"
 
 void test_store(){
     bitcode bc;

@@ -10,7 +10,7 @@
 #include "burrows_wheeler.h"
 #include "move_to_front.h"
 #include "../common/file_info.h"
-#include "huffman.h"
+#include "../common/huffman.h"
 #include "../common/check_args.h"
 
 void decode(arguments* args) {

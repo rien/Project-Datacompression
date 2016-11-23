@@ -9,7 +9,7 @@
 #include "../common/common.h"
 #include "burrows_wheeler.h"
 #include "move_to_front.h"
-#include "huffman.h"
+#include "../common/huffman.h"
 #include "../common/file_info.h"
 
 /**
@@ -19,11 +19,11 @@
  *      -> 'DA3ZIP-BWT' if the burrows wheeler transformation with move-to-front was applied
  *      -> 'DA3ZIP-HUF' if only huffman encoding was used
  * - 4 bytes: amount of blocks
- *    (this restricts the maximum file size to encode to around 35 TB, which should be just enough)
+ *    (this restricts the maximum file size to encode to around 35 TB, which should be enough)
  *
  * Block header
  *
- * - if bwt: 2 bytes: starting index of the bwt
+ * - (if bwt: 2 bytes: starting index of the bwt)
  * - 2 bytes: amount of encoded bytes (<= block size)
  * - 2 bytes: size of the next encoded data (excluding possible bwt starting index)
  *

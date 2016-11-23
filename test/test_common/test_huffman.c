@@ -4,7 +4,7 @@
 
 #include <collection_tools.h>
 #include "test_huffman.h"
-#include "../../src/standaard/huffman.h"
+#include "../../src/common/huffman.h"
 #include "../../src/common/bitcode.h"
 
 void test_huffman_encode(){
