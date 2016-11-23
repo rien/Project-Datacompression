@@ -18,7 +18,6 @@
 #define MAX_NUMBER_LENGTH 19
 
 
-
 size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* args, bool* end_reached){
     size_t current_byte = 0;
     size_t integers_coded = 0;
@@ -123,7 +122,22 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
     return integers_coded;
 }
 
-
+/**
+ * File header
+ *
+ * - 10 bytes: file signature
+ *      -> 'DA3ZIP-SPC' if the specific compression algorithm was used
+ *
+ * Block header
+ *
+ * - 2 bytes: amount of encoded integers
+ * - 2 bytes: size of the next encoded data
+ *
+ * Data:
+ * - huffman tree
+ * - huffman encoded data
+ *
+ */
 void encode(arguments* args){
     clock_t start_time = clock();                               // start timing
 
@@ -131,7 +145,7 @@ void encode(arguments* args){
 
     fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args->destination);       // signature
 
-    byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers on the stack: faster than on the heap
+    byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers
     byte buffer2[MAX_BLOCK_SIZE];
 
     size_t a_read;                                              // amount of bytes read
@@ -140,12 +154,6 @@ void encode(arguments* args){
     size_t input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
     size_t current_block = 0;
-
-    fwrite(&blocks, sizeof(uint32_t), 1, args->destination);     // amount of blocks
-
-
-    bitcode next_integer;
-    bitcode_init(&next_integer);
 
     fread(buffer1, sizeof(byte), 1, args->source);
     if(buffer1[0] == '['){
@@ -156,18 +164,26 @@ void encode(arguments* args){
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0 && !end_reached){
         current_block++;
 
+        // Show progress, not 100% correct because read_numbers sometimes reads a little bit more
+        printf("%lu%% - %lu/%lu\r\n",(current_block*100)/blocks, current_block, blocks);
+
+        // Read the numbers in the input file
         size_t a_integers = read_numbers(buffer1, buffer2, a_read, args, &end_reached);
+
+        // Calculate the difference between integers
         diff_encode(buffer2, buffer1, a_integers, args);
+
+        // Store as variable-length integers
         vri_encode(buffer1, a_integers, buffer2, &a_bytes);
+
+        // Apply huffman
         huffman_encode(buffer2, a_bytes, buffer1, &a_encoded);
 
-
-        // Amount of blocks
-        fwrite(&blocks, sizeof(uint32_t), 1, args->destination);
+        // Write the amount of encoded integers as a 16 bit unsigned integer
+        fwrite(&a_integers, sizeof(uint16_t), 1, args->destination);
 
         // Write encoded data
         fwrite(buffer2, sizeof(byte), a_encoded, args->destination);
-
     }
 
 
@@ -179,7 +195,7 @@ void encode(arguments* args){
         graceful_exit_printf(args, "An error occurred while writing to the output file.");
     }
 
-    // Show off how good we are
+    // Show stats
     clock_t stop_time = clock();
     size_t output_file_size = file_size(args->destination);
     print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");

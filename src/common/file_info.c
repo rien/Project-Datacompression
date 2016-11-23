@@ -44,11 +44,12 @@ void print_stats(size_t src_size, size_t dest_size, double time, char *action) {
 
 
     printf("Done: %s => %s\n", human_readable_src, human_readable_dest);
-    printf("%.2f%% %s in %f seconds. %s/s\n",
+    printf("%.2f%% %s in %.2f seconds. %s/s\n",
            ((double)dest_size*100)/(double)src_size,
             action,
             time,
             human_readable_speed);
+    printf("Compression rate: %.2f\n", (double)src_size/(double)dest_size);
 
     free(human_readable_speed);
     free(human_readable_src);

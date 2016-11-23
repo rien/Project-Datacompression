@@ -7,11 +7,8 @@
 #include <assert.h>
 #include "../common/decoder.h"
 #include "../common/common.h"
-#include "burrows_wheeler.h"
-#include "move_to_front.h"
 #include "../common/file_info.h"
 #include "../common/huffman.h"
-#include "../common/check_args.h"
 
 void decode(arguments* args) {
     clock_t start_time = clock();
@@ -48,8 +45,6 @@ void decode(arguments* args) {
     size_t a_blocks = 0;
     size_t current_block = 0;
 
-    fread(&a_blocks, sizeof(uint32_t), 1, args->source);
-
     while (current_block < a_blocks){
         current_block++;
 
@@ -78,14 +73,17 @@ void decode(arguments* args) {
         // Decompression
         huffman_decode(buffer1, encoded_length, a_encoded, buffer2, &a_decoded);
 
-        assert(a_decoded == a_encoded);
+        // Check if the amount of encoded and decoded bytes match
+        if(a_decoded != a_encoded){
+            graceful_exit_printf(args, "The amount of decoded bytes was not equal to the"
+                                       " amount of encoded bytes. Something went wrong.");
+        };
 
         // Burrows-wheeler transform
         //if(bwt){
         //    move_to_front_decode(buffer2, buffer1, a_encoded);
         //    burrows_wheeler_decode(buffer1, a_encoded, buffer2, bwt_index);
         //}
-
 
         // Write decoded data
         fwrite(buffer2, sizeof(byte), a_decoded, args->destination);

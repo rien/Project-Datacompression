@@ -18,8 +18,6 @@
  * - 10 bytes: file signature
  *      -> 'DA3ZIP-BWT' if the burrows wheeler transformation with move-to-front was applied
  *      -> 'DA3ZIP-HUF' if only huffman encoding was used
- * - 4 bytes: amount of blocks
- *    (this restricts the maximum file size to encode to around 35 TB, which should be enough)
  *
  * Block header
  *
@@ -40,7 +38,7 @@ void encode(arguments *args) {
 
     fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args->destination);       // signature
 
-    byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers on the stack: faster than on the heap
+    byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers
     byte buffer2[MAX_BLOCK_SIZE];
 
     size_t a_read;                                              // amount of bytes read
@@ -49,8 +47,6 @@ void encode(arguments *args) {
     size_t input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
     size_t current_block = 0;
-
-    fwrite(&blocks, sizeof(uint32_t), 1, args->destination);     // amount of blocks
 
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0){
         current_block++;
@@ -67,7 +63,6 @@ void encode(arguments *args) {
 
         // Actual compression
         huffman_encode(buffer1, a_read, buffer2, &a_encoded);
-        assert(a_encoded < MAX_BLOCK_SIZE);
 
         // Original amount of bytes
         fwrite(&a_read, sizeof(uint16_t), 1, args->destination);
@@ -87,7 +82,7 @@ void encode(arguments *args) {
         graceful_exit_printf(args, "An error occurred while writing to the output file.");
     }
 
-    // Show off how good we are
+    // Show stats
     clock_t stop_time = clock();
     size_t output_file_size = file_size(args->destination);
     print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
