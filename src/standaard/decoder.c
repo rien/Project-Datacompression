@@ -42,18 +42,20 @@ void decode(arguments* args) {
         graceful_exit_printf(args, "Wrong file signature. This is not a DA3ZIP file.");
     }
 
-    size_t a_blocks = 0;
     size_t current_block = 0;
-
-    while (current_block < a_blocks){
+    size_t bytes_read = 0;
+    while (true){
         current_block++;
 
-        if(feof(args->source)){
+        bytes_read = (size_t)ftell(args->source);
+        if(bytes_read == input_file_size){
             break;
+        } else {
+            // Show progress
+            printf("Decoding %lu%%\n", bytes_read*100/input_file_size);
         }
 
-        // Show progress
-        printf("Decoding %lu%%\n", ftell(args->source)*100/input_file_size);
+
 
 
         // Block header

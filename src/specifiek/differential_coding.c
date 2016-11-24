@@ -18,7 +18,7 @@ void diff_encode(byte *byte_input, byte *byte_output, size_t a_integers, argumen
             last = input[i];
         } else {
             graceful_exit_printf(args,
-                                 "Input not in strict ascending order. %llu <= %llu",
+                                 "Input not in strict ascending order. %llu <= %llu\n",
                                  input[i],
                                  last);
         }
@@ -35,12 +35,12 @@ void diff_decode(byte *byte_input, byte *byte_output, size_t a_integers, argumen
 
     for (size_t i = 1; i < a_integers; ++i) {
         last = last + input[i] + 1;
-        if (last <= 9223372036854775808) {
+        if (last <= 9223372036854775808UL) {
             output[i] = last;
 
         } else {
             graceful_exit_printf(args,
-                                 "Last calculated value greater than max value. %llu > 2^63",
+                                 "Last calculated value greater than max value. %llu > 2^63\n",
                                  last);
         }
     }

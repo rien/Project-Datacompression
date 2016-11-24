@@ -18,7 +18,7 @@
 #define MAX_NUMBER_LENGTH 19
 
 
-size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* args, bool* end_reached){
+void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_integers, arguments *args, bool *end_reached) {
     size_t current_byte = 0;
     size_t integers_coded = 0;
     bitcode next_integer;
@@ -35,7 +35,7 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
         // Read digits
         while (isdigit(input[current_byte]) &&
                 current_byte < input_size &&
-                next_integer.length <= MAX_NUMBER_LENGTH) {
+                (next_integer.length/8) <= MAX_NUMBER_LENGTH) {
 
             bitcode_store_byte(input[current_byte++], &next_integer);
         }
@@ -44,12 +44,12 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
          * End of buffer, read the rest of the number
          */
 
-        if(current_byte < input_size){
+        if(current_byte == input_size){
             // Read a little bit more
             size_t read_successful;
             while((read_successful = fread(&last_read, sizeof(byte), 1, args->source)) > 0 &&
                     isdigit(last_read) &&
-                    next_integer.length <= MAX_NUMBER_LENGTH){
+                    (next_integer.length/8) <= MAX_NUMBER_LENGTH){
 
                 bitcode_store_byte(last_read, &next_integer);
             }
@@ -75,13 +75,13 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
         } else if(next_integer.length == 0) {
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
-                                 "Character '%c' was unexpected, I only accept JSON positive integer arrays.",
+                                 "Character '%c' was unexpected, I only accept JSON positive integer arrays.\n",
                                  last_read);
             // The max value is 2^63, which has 19 digits
-        } else if(next_integer.length > MAX_NUMBER_LENGTH){
+        } else if((next_integer.length/8) > MAX_NUMBER_LENGTH){
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
-                                 "Encountered a number with more than 19 digits. Max value is 2^63");
+                                 "Encountered a number with more than 19 digits. Max value is 2^63.\n");
 
             // A number was not followed by a comma, wrong delimiter.
         } else if(last_read != ','){
@@ -92,7 +92,9 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
                                  last_read);
         } else {
             // continue
-            assert(input[current_byte] == ',' && 0 < next_integer.length && next_integer.length < 20);
+            assert(current_byte == input_size || input[current_byte] == ',');
+            assert(0 < next_integer.length);
+            assert((next_integer.length/8) < 20);
             current_byte++;
         }
 
@@ -107,7 +109,7 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
         value = strtoull((char*)next_integer.array, (char**)&endbyte, 10);
         if(value > 9223372036854775808ULL){
             bitcode_free(&next_integer);
-            graceful_exit_printf(args, "Number %llu is greater than max value (2^63)", value);
+            graceful_exit_printf(args, "Number %llu is greater than max value (2^63)\n", value);
         }
 
         // Store the integer in the output
@@ -119,7 +121,7 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
 
     }
     bitcode_free(&next_integer);
-    return integers_coded;
+    *a_integers = integers_coded;
 }
 
 /**
@@ -131,12 +133,12 @@ size_t read_numbers(byte* input, byte* output, size_t input_size, arguments* arg
  * Block header
  *
  * - 2 bytes: amount of encoded integers
- * - 2 bytes: size of the next encoded data
+ * - 2 bytes: length of the current block
  *
  * Data:
- * - huffman tree
- * - huffman encoded data
- *
+ * - huffmman tree
+ * - hufffman encoded data
+ * -> vli
  */
 void encode(arguments* args){
     clock_t start_time = clock();                               // start timing
@@ -151,13 +153,14 @@ void encode(arguments* args){
     size_t a_read;                                              // amount of bytes read
     size_t a_encoded;                                           // amount of bytes to be written
     size_t a_bytes;                                             // amount of bytes used by the variable length integers
+    size_t a_integers;                                          // amount of integers to be encoded
     size_t input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
     size_t current_block = 0;
 
     fread(buffer1, sizeof(byte), 1, args->source);
-    if(buffer1[0] == '['){
-        graceful_exit_printf(args, "Unexpected first character, expected a '['");
+    if(buffer1[0] != '['){
+        graceful_exit_printf(args, "Unexpected first character, expected a '['\n");
     };
     bool end_reached = false;
 
@@ -168,19 +171,23 @@ void encode(arguments* args){
         printf("%lu%% - %lu/%lu\r\n",(current_block*100)/blocks, current_block, blocks);
 
         // Read the numbers in the input file
-        size_t a_integers = read_numbers(buffer1, buffer2, a_read, args, &end_reached);
+         read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
 
         // Calculate the difference between integers
         diff_encode(buffer2, buffer1, a_integers, args);
 
         // Store as variable-length integers
-        vri_encode(buffer1, a_integers, buffer2, &a_bytes);
+        vli_encode(buffer1, a_integers, buffer2, &a_bytes);
 
+        a_encoded = a_bytes;
         // Apply huffman
-        huffman_encode(buffer2, a_bytes, buffer1, &a_encoded);
+        //huffman_encode(buffer2, a_bytes, buffer1, &a_encoded);
 
         // Write the amount of encoded integers as a 16 bit unsigned integer
         fwrite(&a_integers, sizeof(uint16_t), 1, args->destination);
+
+        // Write the amount of encoded bytes as a 16 bit unsigned integer
+        fwrite(&a_encoded, sizeof(uint16_t), 1, args->destination);
 
         // Write encoded data
         fwrite(buffer2, sizeof(byte), a_encoded, args->destination);
@@ -189,10 +196,10 @@ void encode(arguments* args){
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.");
+        graceful_exit_printf(args, "An error occurred while reading the input file.\n");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.");
+        graceful_exit_printf(args, "An error occurred while writing to the output file.\n");
     }
 
     // Show stats

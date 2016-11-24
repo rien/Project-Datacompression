@@ -4,11 +4,8 @@
 
 #include <memory.h>
 #include <time.h>
-#include <assert.h>
 #include "../common/encoder.h"
 #include "../common/common.h"
-#include "burrows_wheeler.h"
-#include "move_to_front.h"
 #include "../common/huffman.h"
 #include "../common/file_info.h"
 
@@ -23,7 +20,7 @@
  *
  * - (if bwt: 2 bytes: starting index of the bwt)
  * - 2 bytes: amount of encoded bytes (<= block size)
- * - 2 bytes: size of the next encoded data (excluding possible bwt starting index)
+ * - 2 bytes: length of the current block
  *
  * Data:
  * - huffman tree
@@ -76,10 +73,10 @@ void encode(arguments *args) {
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.");
+        graceful_exit_printf(args, "An error occurred while reading the input file.\n");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.");
+        graceful_exit_printf(args, "An error occurred while writing to the output file.\n");
     }
 
     // Show stats
