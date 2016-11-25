@@ -7,7 +7,6 @@
 #include "priorityqueue.h"
 #include "bitcode.h"
 
-
 void huffman_tree_free(huffman_node *root) {
     if(root->left){
         huffman_tree_free(root->left);

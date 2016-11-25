@@ -194,7 +194,7 @@ bool bitcode_consume_bit(bitcode *bc) {
 }
 
 byte bitcode_consume_byte(bitcode *bc) {
-    assert((bc->cursor + 8) < bc->length);
+    assert((bc->cursor + 7) < bc->length);
     size_t n = bc->cursor;
     bc->cursor += 8;
     byte result = 0;

@@ -49,6 +49,9 @@ void decode(arguments *args){
     size_t current_block = 0;
     size_t bytes_read = (size_t)ftell(args->source);
 
+    char bracket = '[';
+    fwrite(&bracket, sizeof(char), 1, args->destination);
+
     while (true){
         current_block++;
 

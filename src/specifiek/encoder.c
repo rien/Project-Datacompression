@@ -145,7 +145,6 @@ void encode(arguments* args){
     clock_t start_time = clock();                               // start timing
 
     char* sig = "DA3ZIP-SPC";
-
     fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args->destination);       // signature
 
     byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers

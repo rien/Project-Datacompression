@@ -4,6 +4,8 @@
 
 #include <memory.h>
 #include <time.h>
+#include <stdint.h>
+#include <stdio.h>
 #include "../common/encoder.h"
 #include "../common/common.h"
 #include "../common/huffman.h"
@@ -32,8 +34,8 @@ void encode(arguments *args) {
 
     //char* sig = args->bw_transform ? "DA3ZIP-BWT" : "DA3ZIP-HUF";        // file sig
     char* sig = "DA3ZIP-HUF";
-
     fwrite(sig, sizeof(char), FILE_SIG_LENGTH, args->destination);       // signature
+
 
     byte buffer1[MAX_BLOCK_SIZE];                              // Two buffers
     byte buffer2[MAX_BLOCK_SIZE];
@@ -44,6 +46,7 @@ void encode(arguments *args) {
     size_t input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
     size_t current_block = 0;
+
 
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0){
         current_block++;
