@@ -9,7 +9,6 @@
 
 #include <malloc.h>
 #include <stdio.h>
-#include <ecpglib.h>
 #include "file_info.h"
 
 /**
