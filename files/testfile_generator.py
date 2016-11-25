@@ -3,8 +3,7 @@ import random
 
 sizes = {'1K'   : 1000,
          '1M'   : 1000000,
-         '10M'  : 10000000,
-         '100M' : 100000000}
+         '10M'  : 10000000}
 
 for k, v in sizes.items():
     file = open(k + '.json', 'w')
@@ -22,7 +21,7 @@ for k, v in sizes.items():
     file.write("[")
     for r in rand_sorted[:-1]:
         file.write(str(r))
-        file.write(", ")
+        file.write(",")
     file.write(str(rand_sorted[-1]))
     file.write("]")
 

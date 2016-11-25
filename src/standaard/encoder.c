@@ -39,7 +39,7 @@ void encode(arguments *args) {
     byte buffer2[MAX_BLOCK_SIZE];
 
     size_t a_read;                                              // amount of bytes read
-    size_t a_encoded;                                           // amount of bytes to be written
+    size_t encoded_length;                                           // amount of bytes to be written
     //size_t t_start;                                             // starting position of the bwt-transformed string
     size_t input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
@@ -59,16 +59,16 @@ void encode(arguments *args) {
         //}
 
         // Actual compression
-        huffman_encode(buffer1, a_read, buffer2, &a_encoded);
+        huffman_encode(buffer1, a_read, buffer2, &encoded_length);
 
         // Original amount of bytes
         fwrite(&a_read, sizeof(uint16_t), 1, args->destination);
 
         // Write the amount of encoded bytes as a 16 bit unsigned integer
-        fwrite(&a_encoded, sizeof(uint16_t), 1, args->destination);
+        fwrite(&encoded_length, sizeof(uint16_t), 1, args->destination);
 
         // Write encoded data
-        fwrite(buffer2, sizeof(byte), a_encoded, args->destination);
+        fwrite(buffer2, sizeof(byte), encoded_length, args->destination);
     }
 
     // Error handling

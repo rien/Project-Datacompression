@@ -43,7 +43,7 @@ void decode(arguments* args) {
     }
 
     size_t current_block = 0;
-    size_t bytes_read = 0;
+    size_t bytes_read;
     while (true){
         current_block++;
 
@@ -73,7 +73,7 @@ void decode(arguments* args) {
         }
 
         // Decompression
-        huffman_decode(buffer1, encoded_length, a_encoded, buffer2, &a_decoded);
+        huffman_decode(buffer1, encoded_length, buffer2, a_encoded, &a_decoded);
 
         // Check if the amount of encoded and decoded bytes match
         if(a_decoded != a_encoded){

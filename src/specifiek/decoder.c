@@ -47,7 +47,7 @@ void decode(arguments *args){
     }
 
     size_t current_block = 0;
-    size_t bytes_read = 0;
+    size_t bytes_read = (size_t)ftell(args->source);
 
     while (true){
         current_block++;

@@ -46,7 +46,7 @@ huffman_node* huffman_reconstruct_tree(bitcode* input_bc, huffman_dictionary* hd
 
 void huffman_encode(byte input[], size_t length, byte *output, size_t *output_length);
 
-void huffman_decode(byte input[], size_t length, size_t a_encoded, byte output[], size_t* output_length);
+void huffman_decode(byte input[], size_t input_length, byte output[], size_t a_encoded, size_t *output_length);
 
 
 #endif //DA3_PROJECT_HUFFMAN_H

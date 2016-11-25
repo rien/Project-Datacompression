@@ -187,12 +187,12 @@ void huffman_encode(byte *input, size_t length, byte *output, size_t *output_len
     bitcode_free(&output_code);
 }
 
-void huffman_decode(byte *input, size_t length, size_t a_encoded, byte *output, size_t *output_length) {
+void huffman_decode(byte input[], size_t input_length, byte output[], size_t a_encoded, size_t *output_length) {
     huffman_dictionary hd;
     huffman_init(&hd);
 
     bitcode input_bc;
-    bitcode_from_array(input, length, &input_bc);
+    bitcode_from_array(input, input_length, &input_bc);
 
     hd.root = huffman_reconstruct_tree(&input_bc, &hd);
 

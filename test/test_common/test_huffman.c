@@ -128,7 +128,7 @@ void test_huffman_decode(){
 
     size_t output_length;
     char output[20];
-    huffman_decode(data, 12, 20, (byte*)output, &output_length);
+    huffman_decode(data, 12, (byte *) output, 20, &output_length);
 
     test_assert("Output length not correct", output_length == 20);
     test_assert("Output string not correct", strncmp(output, "AAAAAABCCCCCCDDEEEEE", output_length) == 0);
