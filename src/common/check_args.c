@@ -4,10 +4,17 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "check_args.h"
 
 void graceful_exit_printf(arguments* args, const char *msg,...) {
-    printf(msg); //expand varargs
+
+    //expand varargs
+    va_list vararg;
+    va_start(vararg, msg);
+    vprintf(msg, vararg);
+    va_end(vararg);
+
     printf("Usage: %s {-d|-c} source destination\n", program_name);
     // close files, doesn't matter if they are open or not
     if(args->source){
