@@ -28,4 +28,6 @@ void test_move_to_front(){
     for (size_t i = 0; i < length2; ++i) {
         test_assert("Move to front with weird chars",test2[i] == result[i]);
     }
+    free(buffer);
+    free(result);
 }

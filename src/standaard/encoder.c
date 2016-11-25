@@ -10,8 +10,13 @@
 #include "../common/common.h"
 #include "../common/huffman.h"
 #include "../common/file_info.h"
+#include "../common/check_args.h"
 
 /**
+ * Encode a file with the standard compression algorithm (using huffman).
+ *
+ * Code for using the burrows-wheeler transformation has been commented.
+ *
  * File header
  *
  * - 10 bytes: file signature
@@ -44,15 +49,11 @@ void encode(arguments *args) {
     size_t encoded_length;                                           // amount of bytes to be written
     //size_t t_start;                                             // starting position of the bwt-transformed string
     unsigned long long input_file_size = file_size(args->source);            // file size of the source
-    size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
-    size_t current_block = 0;
-
 
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0){
-        current_block++;
 
         // Show progress
-        printf("%lu%% - %lu/%lu\r\n",(current_block*100)/blocks, current_block, blocks);
+        print_progress(file_position(args->source), input_file_size, start_time, true);
 
         // Burrows wheeler + move to front
         //if(args->bw_transform){
@@ -85,5 +86,5 @@ void encode(arguments *args) {
     // Show stats
     clock_t stop_time = clock();
     unsigned long long output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
+    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, true);
 }

@@ -134,6 +134,7 @@ void test_huffman_decode(){
     test_assert("Output string not correct", strncmp(output, "AAAAAABCCCCCCDDEEEEE", output_length) == 0);
 
     huffman_free_dictionary(&hd);
+    bitcode_free(&tree_code);
 }
 
 void test_huffman(){

@@ -79,7 +79,6 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
         // Closing bracket: we reached the end of the file, ignore the rest
         if(last_read == ']'){
             *end_reached = true;
-            printf("Reached ending ']', finishing...\n");
 
             // We did not encounter a digit
         } else if(next_integer.length == 0) {
@@ -181,7 +180,7 @@ void encode(arguments* args){
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0 && !end_reached){
 
         // Show progress
-        printf("%llu%%\n", file_position(args->source)*100/input_file_size);
+        print_progress(file_position(args->source), input_file_size, start_time, true);
 
         // Read the numbers in the input file
         read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
@@ -218,5 +217,5 @@ void encode(arguments* args){
     // Show stats
     clock_t stop_time = clock();
     unsigned long long output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
+    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, true);
 }

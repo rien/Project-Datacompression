@@ -79,8 +79,8 @@ void bitcode_store_bit(bool bit, bitcode *bc) {
  * Write all the bits in the current code to an uchar array.
  * This expects the destination to be large enough.
  *
- * @param dest the array where the data will be written to
- * @param bytes_written pointer to which the amount of written bytes will be stored
+ * @param dest              the array where the data will be written to
+ * @param bytes_written     pointer to which the amount of written bytes will be stored
  */
 void bitcode_write_all(byte *dest, size_t* bytes_written, const bitcode *bc) {
     size_t total = (bc->length-1)/8+1;

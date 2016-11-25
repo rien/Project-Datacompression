@@ -229,7 +229,8 @@ void huffman_decode(byte input[], size_t input_length, byte output[], size_t a_e
         }
     }
 
-
+    huffman_free_dictionary(&hd);
+    bitcode_free(&input_bc);
 
     *output_length = index;
 }

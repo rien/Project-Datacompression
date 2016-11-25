@@ -10,6 +10,9 @@
 #include "../common/file_info.h"
 #include "../common/huffman.h"
 
+/**
+ * Decode a file which was encoded with the standard algorithm.
+ */
 void decode(arguments* args) {
     clock_t start_time = clock();
     // bool bwt = false;
@@ -39,7 +42,7 @@ void decode(arguments* args) {
     //} else if (strncmp(signature, "DA3ZIP-HUF", FILE_SIG_LENGTH) == 0){
     //    bwt = true;
     } else {
-        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP file.");
+        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP file.\n");
     }
 
     size_t current_block = 0;
@@ -52,7 +55,7 @@ void decode(arguments* args) {
             break;
         } else {
             // Show progress
-            printf("Decoding %llu%%\n", bytes_read*100/input_file_size);
+            print_progress(bytes_read, input_file_size, start_time, false);
         }
 
 
@@ -105,6 +108,6 @@ void decode(arguments* args) {
     // Show off how good we are
     clock_t stop_time = clock();
     size_t output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "inflation;");
+    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
 
 }

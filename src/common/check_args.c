@@ -10,9 +10,9 @@
 /**
  * Exit the program prematurely, but close open files.
  *
- * @param args struct with the src and dest file pointers
- * @param usage_needed if a string needs to be printed with usage info
- * @param msg format string with the info to be printed before exiting. Works like printf with varargs.
+ * @param args              struct with the src and dest file pointers
+ * @param usage_needed      if a message needs to be shown with usage info
+ * @param msg               format string with the info to be printed before exiting. Works like printf with varargs.
  */
 void graceful_exit_printf(arguments* args, bool usage_needed, const char *msg,...) {
 
@@ -22,7 +22,10 @@ void graceful_exit_printf(arguments* args, bool usage_needed, const char *msg,..
     vprintf(msg, vararg);
     va_end(vararg);
 
-    printf("Usage: %s {-d|-c} source destination\n", program_name);
+    if(usage_needed){
+        printf("Usage: %s {-d|-c} source destination\n", program_name);
+    }
+
     // close files, doesn't matter if they are open or not
     if(args->source){
         fclose(args->source);
@@ -36,9 +39,9 @@ void graceful_exit_printf(arguments* args, bool usage_needed, const char *msg,..
 /**
  * Parse the arguments and fill in default values.
  *
- * @param args struct which will be filled in with the parsed values
- * @param argc argument count
- * @param argv list of arguments
+ * @param args  struct which will be filled in with the parsed values
+ * @param argc  argument count
+ * @param argv  list of arguments
  */
 void parse_arguments(arguments* args, int argc, char **argv) {
 

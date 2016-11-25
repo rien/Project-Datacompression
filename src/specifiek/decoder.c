@@ -48,12 +48,12 @@ void decode(arguments *args){
 
     // Read file signature
     if(fread(&signature, sizeof(char), FILE_SIG_LENGTH, args->source) < FILE_SIG_LENGTH) {
-        graceful_exit_printf(args, false, "Error reading the input file.");
+        graceful_exit_printf(args, false, "Error reading the input file.\n");
     }
 
     // Test if the file is encoded with the specific algorithm
     if(strncmp(signature, "DA3ZIP-SPC", FILE_SIG_LENGTH) != 0) {
-        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP-SPC file.");
+        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP-SPC file.\n");
     }
 
     size_t current_block = 0;
@@ -69,7 +69,7 @@ void decode(arguments *args){
             break;
         } else {
             // Show progress
-            printf("Decoding %llu%%\n", bytes_read*100/input_file_size);
+            print_progress(bytes_read, input_file_size, start_time, false);
         }
 
         fread(&a_integers, sizeof(uint16_t), 1, args->source);       // Amount of encoded integers
@@ -78,7 +78,7 @@ void decode(arguments *args){
         // Read data
         a_read = fread(buffer1, sizeof(byte), encoded_length, args->source);
         if(a_read < encoded_length){
-            printf("Stopped reading unexpectedly. Help.\n");
+            printf("Stopped reading unexpectedly.\n");
             break;
         }
 
@@ -129,5 +129,5 @@ void decode(arguments *args){
     // Show off how good we are
     clock_t stop_time = clock();
     unsigned long long output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "inflation;");
+    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
 }

@@ -98,6 +98,8 @@ void test_store_byte(){
     bitcode_store_byte(0xFF, &bc);
     test_assert("Test first byte", bc.array[0] == 0b10000000);
     test_assert("Test second byte", bc.array[1] == 0b01111111);
+
+    bitcode_free(&bc);
 }
 
 void test_read(){
@@ -139,6 +141,8 @@ void test_read(){
 
     test_assert("Read bit", bitcode_consume_bit(&bc) == true);
     test_assert("Read byte", bitcode_consume_byte(&bc) == 0b10101010);
+
+    bitcode_free(&bc);
 }
 
 void test_from_array(){
@@ -152,6 +156,8 @@ void test_from_array(){
     test_assert("Read byte", bitcode_consume_byte(&bc) == 0xF0);
     test_assert("Read byte", bitcode_consume_byte(&bc) == 0x0F);
     test_assert("Read bit", bitcode_consume_bit(&bc) == true);
+
+    bitcode_free(&bc);
 }
 
 void test_clear(){
@@ -269,6 +275,8 @@ void test_clear_one(){
     bitcode_clear_one(&bc);
     test_assert("Next bit", bc.length == 0);
     test_assert("Data", bc.array[1] == 0 && bc.array[0] == 0);
+
+    bitcode_free(&bc);
 }
 
 void test_append(){
@@ -359,6 +367,10 @@ void test_append(){
     test_assert("Size should be 23", bc[3].length == 21);
     test_assert("Content 2", bc[3].array[1] == 0b11100011);
     test_assert("Content 3", bc[3].array[2] == 0b11111);
+
+    for (size_t i = 0; i < 4; ++i) {
+        bitcode_free(&bc[i]);
+    }
 }
 
 

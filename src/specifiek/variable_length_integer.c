@@ -83,6 +83,7 @@ void vli_decode(byte *input, byte *output_bytes, size_t input_size, size_t *a_in
         }
         output[i++] = value;
     }
+    bitcode_free(&bc);
     if(a_integers){
         *a_integers = i;
     }
