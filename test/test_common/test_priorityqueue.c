@@ -40,8 +40,6 @@ void test_simple_insert(){
     for (size_t j = 0; j < 4 ; ++j) {
         test_assert("Should remove last item", pq_remove_last(&pq)->sum == j);
     }
-
-
 }
 
 

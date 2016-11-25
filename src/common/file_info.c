@@ -3,22 +3,34 @@
 //
 
 #include <malloc.h>
-#include <bits/time.h>
-#include <time.h>
+#include <stdio.h>
 #include "file_info.h"
 
+/**
+ * The current position in a file.
+ * Sadly, large file sizes are not measurable with the C99 standard.
+ */
+unsigned long long int file_position(FILE *file) {
+    return (unsigned long long int) ftello(file);
+}
 
-
-size_t file_size(FILE *file) {
+/**
+ * The size in bytes of a file.
+ * Sadly, large file sizes are not measurable with the C99 standard.
+ */
+unsigned long long file_size(FILE *file) {
     rewind(file);
-    fseek(file, 0L, SEEK_END);
-    size_t size = (size_t)ftell(file);
+    fseeko(file, 0L, SEEK_END);
+    unsigned  long long size = ftello(file);
     rewind(file);
     return size;
 }
 
 const char* file_sizes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB"};
 
+/**
+ * Print the human readable size of a give amount of bytes.
+ */
 char *human_readable_size(size_t size) {
     // number = 6 chars
     // space  = 1 char
@@ -37,7 +49,7 @@ char *human_readable_size(size_t size) {
     return resultstr;
 }
 
-void print_stats(size_t src_size, size_t dest_size, double time, char *action) {
+void print_stats(unsigned long long int src_size, unsigned long long int dest_size, double time, char *action) {
     char* human_readable_src = human_readable_size(src_size);
     char* human_readable_dest = human_readable_size(dest_size);
     char* human_readable_speed = human_readable_size((size_t)(src_size/time));
@@ -55,3 +67,4 @@ void print_stats(size_t src_size, size_t dest_size, double time, char *action) {
     free(human_readable_src);
     free(human_readable_dest);
 }
+

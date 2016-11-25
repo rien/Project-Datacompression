@@ -11,7 +11,6 @@ int main(int argc, char* argv[]) {
     parse_arguments(&args, argc, argv);
 
     switch (args.option){
-        // Both encode() and decode() access the arguments as external variables
         case COMPRESS: encode(&args);
             break;
         case DECOMPRESS: decode(&args);

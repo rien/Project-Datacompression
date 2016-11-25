@@ -7,13 +7,18 @@
 #include "priorityqueue.h"
 #include "bitcode.h"
 
+/**
+ * Free the huffman tree recursively.
+ */
 void huffman_tree_free(huffman_node *root) {
+    // Recursive calls
     if(root->left){
         huffman_tree_free(root->left);
     }
     if(root->right){
         huffman_tree_free(root->right);
     }
+
     // If a node is a leaf (it has a codeword) it should not be freed,
     // leaves are part of the huffman_dictionary struct.
     if(root->codeword){
@@ -23,6 +28,9 @@ void huffman_tree_free(huffman_node *root) {
     }
 }
 
+/**
+ * Free the huffman dictionary by freeing its tree and its tree_code.
+ */
 void huffman_free_dictionary(huffman_dictionary *dict) {
     if(dict->root){
         huffman_tree_free(dict->root);
@@ -30,6 +38,9 @@ void huffman_free_dictionary(huffman_dictionary *dict) {
     bitcode_free(&dict->tree_code);
 }
 
+/**
+ * Create a parent of two huffman nodes which has the sum of both its children.
+ */
 huffman_node* huffman_node_parent(huffman_node* left, huffman_node* right){
     huffman_node* parent = malloc(sizeof(huffman_node));
     parent->left = left;

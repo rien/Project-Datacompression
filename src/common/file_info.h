@@ -9,12 +9,13 @@
 #ifndef DA3_PROJECT_FILE_INFO_H
 #define DA3_PROJECT_FILE_INFO_H
 
+unsigned long long int file_position(FILE* file);
 
-size_t file_size(FILE* file);
+unsigned long long int file_size(FILE* file);
 
 char* human_readable_size(size_t size);
 
-void print_stats(size_t src_size, size_t dest_size, double time, char *action);
+void print_stats(unsigned long long src_size, unsigned long long dest_size, double time, char *action);
 
 
 #endif //DA3_PROJECT_FILE_INFO_H

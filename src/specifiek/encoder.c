@@ -17,7 +17,17 @@
 
 #define MAX_NUMBER_LENGTH 19
 
-
+/**
+ * Read the comma separated list of numbers and save them as 64-bit integers. If needed, this method will read
+ * a little bit more of the input file to complete reading a number. This will be 19 bytes more at most.
+ *
+ * @param input         buffer which contains the text data
+ * @param input_size    length of the input
+ * @param output        buffer where the 64-bit integers will be written to
+ * @param a_integers    amount of integers that are parsed
+ * @param args          struct with file pointers to the src and dest files
+ * @param end_reached   boolean pointer where 'true' will be written to if the end of the file (a ']') is reached
+ */
 void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_integers, arguments *args, bool *end_reached) {
     size_t current_byte = 0;
     size_t integers_coded = 0;
@@ -55,7 +65,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
             }
             if(read_successful == 0){
                 bitcode_free(&next_integer);
-                graceful_exit_printf(args, "Unexpectedly stopped reading.");
+                graceful_exit_printf(args, false, "Unexpectedly stopped reading.");
             }
 
         } else {
@@ -75,6 +85,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
         } else if(next_integer.length == 0) {
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
+                                 false,
                                  "Character '%c' was unexpected, I only accept JSON positive integer arrays.\n",
                                  last_read);
 
@@ -82,14 +93,16 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
         } else if((next_integer.length/8) > MAX_NUMBER_LENGTH){
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
+                                 false,
                                  "Encountered a number with more than 19 digits. Max value is 2^63.\n");
 
             // A number was not followed by a comma, wrong delimiter.
         } else if(last_read != ','){
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
+                                 false,
                                  "A number was followed by the character '%c'. "
-                                         "Numbers should be delimited by commas (,).\n",
+                                 "Numbers should be delimited by commas (,).\n",
                                  last_read);
         } else {
             // continue
@@ -110,7 +123,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
         value = strtoull((char*)next_integer.array, (char**)&endbyte, 10);
         if(value > 9223372036854775808ULL){
             bitcode_free(&next_integer);
-            graceful_exit_printf(args, "Number %llu is greater than max value (2^63)\n", value);
+            graceful_exit_printf(args, false, "Number %llu is greater than max value (2^63)\n", (unsigned long long)value);
         }
 
         // Store the integer in the output
@@ -126,6 +139,9 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
 }
 
 /**
+ * Encode a file using the specific algorithm.
+ *
+ *
  * File header
  *
  * - 10 bytes: file signature
@@ -154,18 +170,18 @@ void encode(arguments* args){
     size_t a_encoded;                                           // amount of bytes to be written
     size_t a_bytes;                                             // amount of bytes used by the variable length integers
     size_t a_integers;                                          // amount of integers to be encoded
-    size_t input_file_size = file_size(args->source);            // file size of the source
+    unsigned long long input_file_size = file_size(args->source);            // file size of the source
 
     fread(buffer1, sizeof(byte), 1, args->source);
     if(buffer1[0] != '['){
-        graceful_exit_printf(args, "Unexpected first character, expected a '['\n");
+        graceful_exit_printf(args, false, "Unexpected first character, expected a '['\n");
     };
     bool end_reached = false;
 
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0 && !end_reached){
 
         // Show progress
-        printf("%lu%%\n", ftell(args->source)*100/input_file_size);
+        printf("%llu%%\n", file_position(args->source)*100/input_file_size);
 
         // Read the numbers in the input file
         read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
@@ -193,14 +209,14 @@ void encode(arguments* args){
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.\n");
+        graceful_exit_printf(args, false, "An error occurred while reading the input file.\n");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.\n");
+        graceful_exit_printf(args, false, "An error occurred while writing to the output file.\n");
     }
 
     // Show stats
     clock_t stop_time = clock();
-    size_t output_file_size = file_size(args->destination);
+    unsigned long long output_file_size = file_size(args->destination);
     print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
 }

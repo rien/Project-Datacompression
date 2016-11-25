@@ -7,11 +7,18 @@
 #include "circular_string.h"
 #include "stdio.h"
 
+/**
+ * Get the byte at position x.
+ * x can be greater than the length of the string because it is circular.
+ */
 byte circular_string_get(const circular_string* cstr, size_t index) {
     size_t position = (cstr->offset + index) % cstr->length;
     return cstr->base[position];
 }
 
+/**
+ * Get the first byte of the string.
+ */
 byte circular_string_first(const circular_string *cstr) {
     return circular_string_get(cstr, 0);
 }
@@ -34,6 +41,9 @@ int circular_string_compare(const void* a, const void* b) {
     return diff;
 }
 
+/**
+ * Get the last byte of the string
+ */
 byte circular_string_last(const circular_string *cstr) {
     return circular_string_get(cstr, cstr->length-1);
 }

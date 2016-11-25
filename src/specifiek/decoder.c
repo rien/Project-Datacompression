@@ -11,7 +11,14 @@
 #include "variable_length_integer.h"
 #include "differential_coding.h"
 
-
+/**
+ * Write the decoded numbers as text to a buffer, separated by commas.
+ *
+ * @param input_bytes   the decoded number, an array of bytes which will be cast to 64-bit integres
+ * @param a_integers    the amount of 64-bit integers
+ * @param output        output buffer
+ * @param a_decoded     pointer to which the value will be written of the amount of written bytes
+ */
 void write_numbers(byte *input_bytes, size_t a_integers, byte *output, size_t *a_decoded) {
     uint64_t* input = (uint64_t*) input_bytes;
     size_t bytes_written = 0;
@@ -21,6 +28,9 @@ void write_numbers(byte *input_bytes, size_t a_integers, byte *output, size_t *a
     *a_decoded = bytes_written;
 }
 
+/**
+ *  Decode a file which was encoded using the specific algorithm.
+ */
 void decode(arguments *args){
     clock_t start_time = clock();
 
@@ -30,7 +40,7 @@ void decode(arguments *args){
     size_t a_read = 0;
     //uint16_t a_encoded = 0;
     uint16_t encoded_length = 0;
-    size_t input_file_size = file_size(args->source);
+    unsigned long long input_file_size = file_size(args->source);
     size_t a_decoded;
     size_t a_integers;
 
@@ -38,16 +48,16 @@ void decode(arguments *args){
 
     // Read file signature
     if(fread(&signature, sizeof(char), FILE_SIG_LENGTH, args->source) < FILE_SIG_LENGTH) {
-        graceful_exit_printf(args, "Error reading file.");
+        graceful_exit_printf(args, false, "Error reading the input file.");
     }
 
     // Test if the file is encoded with the specific algorithm
     if(strncmp(signature, "DA3ZIP-SPC", FILE_SIG_LENGTH) != 0) {
-        graceful_exit_printf(args, "Wrong file signature. This is not a DA3ZIP-SPC file.");
+        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP-SPC file.");
     }
 
     size_t current_block = 0;
-    size_t bytes_read = (size_t)ftell(args->source);
+    unsigned long long bytes_read = file_position(args->source);
 
     char bracket = '[';
     fwrite(&bracket, sizeof(char), 1, args->destination);
@@ -59,7 +69,7 @@ void decode(arguments *args){
             break;
         } else {
             // Show progress
-            printf("Decoding %lu%%\n", bytes_read*100/input_file_size);
+            printf("Decoding %llu%%\n", bytes_read*100/input_file_size);
         }
 
         fread(&a_integers, sizeof(uint16_t), 1, args->source);       // Amount of encoded integers
@@ -87,7 +97,7 @@ void decode(arguments *args){
 
         // Check if the amount of encoded and decoded integers match
         if(a_integers != a_integers_decoded){
-            graceful_exit_printf(args, "The amount of decoded integers was not equal to the"
+            graceful_exit_printf(args, false, "The amount of decoded integers was not equal to the"
                     " amount of encoded integers. Something went wrong.\n");
         };
 
@@ -98,7 +108,7 @@ void decode(arguments *args){
         write_numbers(buffer1, a_integers, buffer2, &a_decoded);
 
         // Last ',' must be a closing bracket
-        bytes_read = (size_t)ftell(args->source);
+        bytes_read = (size_t)file_position(args->source);
         if(bytes_read == input_file_size){
             buffer2[a_decoded-1] = ']';
         }
@@ -110,14 +120,14 @@ void decode(arguments *args){
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.\n");
+        graceful_exit_printf(args, false, "An error occurred while reading the input file.\n");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.\n");
+        graceful_exit_printf(args, false, "An error occurred while writing to the output file.\n");
     }
 
     // Show off how good we are
     clock_t stop_time = clock();
-    size_t output_file_size = file_size(args->destination);
+    unsigned long long output_file_size = file_size(args->destination);
     print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "inflation;");
 }

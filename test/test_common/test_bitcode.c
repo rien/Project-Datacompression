@@ -2,6 +2,7 @@
 // Created by rien on 10/22/16.
 //
 
+#include <malloc.h>
 #include "test_bitcode.h"
 #include "../../src/common/bitcode.h"
 #include "testmacro.h"
@@ -10,8 +11,13 @@ void test_store(){
     bitcode bc;
     bitcode_init(&bc);
     test_assert("Should be empty", bc.length == 0);
-    test_assert("Should have one byte", bc.total_bytes == 1);
+    test_assert("Should have eight bytes", bc.total_bytes == 8);
     test_assert("Should have an array", bc.array != NULL);
+
+    // Swap the array with a smaller one to allow expanding to happen more quickly
+    free(bc.array);
+    bc.array = calloc(sizeof(byte), 1);
+    bc.total_bytes = 1;
 
     // write 16 bits
 

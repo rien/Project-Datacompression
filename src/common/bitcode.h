@@ -10,6 +10,12 @@
 #include "uchar.h"
 #include "common.h"
 
+/**
+ * This module is used as an abstraction around the low-level bit manipulation that has to be done.
+ * It allows easy writing and reading of individual bits, and groups of bits with variable lengths.
+ */
+
+
 typedef struct {
     // array to store the bits
     byte* array;
@@ -26,9 +32,9 @@ typedef struct {
 
 void bitcode_init(bitcode* bc);
 
-void bitcode_from_array(byte *data, size_t length, bitcode *bc);
+void bitcode_from_array(const byte *data, size_t length, bitcode *bc);
 
-void bitcode_copy(bitcode* src, bitcode* dest);
+void bitcode_copy(const bitcode *src, bitcode *dest);
 
 void bitcode_free(bitcode* bc);
 
@@ -45,8 +51,6 @@ void bitcode_clear_until(size_t bit_count, bitcode* bc);
 void bitcode_clear_one(bitcode* bc);
 
 bool bitcode_consume_bit(bitcode *bc);
-
-bool bitcode_read_last_bit(bitcode *bc);
 
 byte bitcode_consume_byte(bitcode *bc);
 

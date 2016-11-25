@@ -43,7 +43,7 @@ void encode(arguments *args) {
     size_t a_read;                                              // amount of bytes read
     size_t encoded_length;                                           // amount of bytes to be written
     //size_t t_start;                                             // starting position of the bwt-transformed string
-    size_t input_file_size = file_size(args->source);            // file size of the source
+    unsigned long long input_file_size = file_size(args->source);            // file size of the source
     size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
     size_t current_block = 0;
 
@@ -76,14 +76,14 @@ void encode(arguments *args) {
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.\n");
+        graceful_exit_printf(args, false, "An error occurred while reading the input file.\n");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.\n");
+        graceful_exit_printf(args, false, "An error occurred while writing to the output file.\n");
     }
 
     // Show stats
     clock_t stop_time = clock();
-    size_t output_file_size = file_size(args->destination);
+    unsigned long long output_file_size = file_size(args->destination);
     print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, "compression");
 }

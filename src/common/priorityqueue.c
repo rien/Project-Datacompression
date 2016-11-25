@@ -17,11 +17,6 @@ int huffman_comparator(const void* a, const void* b){
     return (hb < ha) ? -1 : (int)(hb - ha);
 }
 
-void pq_free(priorityqueue *pq) {
-    free(pq->items);
-    free(pq);
-}
-
 /**
  * Insert an item in the priorityqueue and keep it is a sorted order.
  */

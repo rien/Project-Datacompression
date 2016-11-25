@@ -21,14 +21,14 @@ void decode(arguments* args) {
     uint16_t a_encoded = 0;
     uint16_t encoded_length = 0;
     //uint16_t bwt_index = 0;
-    size_t input_file_size = file_size(args->source);
+    unsigned long long input_file_size = file_size(args->source);
     size_t a_decoded;
 
     char signature[FILE_SIG_LENGTH];
 
     // Read file signature
     if(fread(&signature, sizeof(char), FILE_SIG_LENGTH, args->source) < FILE_SIG_LENGTH) {
-        graceful_exit_printf(args, "Error reading file.");
+        graceful_exit_printf(args, false, "Error reading input file.");
     }
 
     // The file was encoded using only Huffman
@@ -39,20 +39,20 @@ void decode(arguments* args) {
     //} else if (strncmp(signature, "DA3ZIP-HUF", FILE_SIG_LENGTH) == 0){
     //    bwt = true;
     } else {
-        graceful_exit_printf(args, "Wrong file signature. This is not a DA3ZIP file.");
+        graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP file.");
     }
 
     size_t current_block = 0;
-    size_t bytes_read;
+    unsigned long long bytes_read;
     while (true){
         current_block++;
 
-        bytes_read = (size_t)ftell(args->source);
+        bytes_read = (size_t)file_position(args->source);
         if(bytes_read == input_file_size){
             break;
         } else {
             // Show progress
-            printf("Decoding %lu%%\n", bytes_read*100/input_file_size);
+            printf("Decoding %llu%%\n", bytes_read*100/input_file_size);
         }
 
 
@@ -77,8 +77,10 @@ void decode(arguments* args) {
 
         // Check if the amount of encoded and decoded bytes match
         if(a_decoded != a_encoded){
-            graceful_exit_printf(args, "The amount of decoded bytes was not equal to the"
-                                       " amount of encoded bytes. Something went wrong.");
+            graceful_exit_printf(args,
+                                 false,
+                                 "The amount of decoded bytes was not equal to the"
+                                 " amount of encoded bytes. Something went wrong.");
         };
 
         // Burrows-wheeler transform
@@ -94,10 +96,10 @@ void decode(arguments* args) {
 
     // Error handling
     if(ferror(args->source)){
-        graceful_exit_printf(args, "An error occurred while reading the input file.");
+        graceful_exit_printf(args, false, "An error occurred while reading the input file.");
     }
     if(ferror(args->destination)){
-        graceful_exit_printf(args, "An error occurred while writing to the output file.");
+        graceful_exit_printf(args, false, "An error occurred while writing to the output file.");
     }
 
     // Show off how good we are

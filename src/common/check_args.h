@@ -25,7 +25,7 @@ typedef struct {
     uint16_t block_size;
 } arguments;
 
-void graceful_exit_printf(arguments* args, const char *msg,...);
+void graceful_exit_printf(arguments* args, bool usage_needed, const char *msg,...);
 
 void parse_arguments(arguments* args, int argc, char* argv[]);
 

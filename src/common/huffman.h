@@ -12,8 +12,13 @@
 #include "common.h"
 
 typedef struct {
+    // The word it represents
     byte word;
+
+    // The encoded bitcode
     bitcode bitcode;
+
+    // The amount of occurrences in the text
     size_t occurrences;
 } huffman_codeword;
 
