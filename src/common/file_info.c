@@ -16,7 +16,7 @@
  * Sadly, large file sizes are not measurable with the C99 standard.
  */
 unsigned long long int file_position(FILE *file) {
-    return (unsigned long long int) ftello(file);
+    return (unsigned long long int) ftell(file);
 }
 
 /**
@@ -25,8 +25,8 @@ unsigned long long int file_position(FILE *file) {
  */
 unsigned long long file_size(FILE *file) {
     rewind(file);
-    fseeko(file, 0L, SEEK_END);
-    unsigned  long long size = ftello(file);
+    fseek(file, 0L, SEEK_END);
+    unsigned  long long size = (unsigned long long) ftell(file);
     rewind(file);
     return size;
 }
