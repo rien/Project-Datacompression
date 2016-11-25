@@ -10,7 +10,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include <ecpglib.h>
 #include <time.h>
 #include "check_args.h"
 
