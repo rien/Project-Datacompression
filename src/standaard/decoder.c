@@ -45,10 +45,8 @@ void decode(arguments* args) {
         graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP file.\n");
     }
 
-    size_t current_block = 0;
     unsigned long long bytes_read;
     while (true){
-        current_block++;
 
         bytes_read = (size_t)file_position(args->source);
         if(bytes_read == input_file_size){

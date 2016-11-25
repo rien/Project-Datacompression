@@ -56,14 +56,12 @@ void decode(arguments *args){
         graceful_exit_printf(args, false, "Wrong file signature. This is not a DA3ZIP-SPC file.\n");
     }
 
-    size_t current_block = 0;
     unsigned long long bytes_read = file_position(args->source);
 
     char bracket = '[';
     fwrite(&bracket, sizeof(char), 1, args->destination);
 
     while (true){
-        current_block++;
 
         if(bytes_read == input_file_size){
             break;
@@ -108,7 +106,7 @@ void decode(arguments *args){
         write_numbers(buffer1, a_integers, buffer2, &a_decoded);
 
         // Last ',' must be a closing bracket
-        bytes_read = (size_t)file_position(args->source);
+        bytes_read = file_position(args->source);
         if(bytes_read == input_file_size){
             buffer2[a_decoded-1] = ']';
         }
