@@ -1,12 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+
 
 #include "common/check_args.h"
-#include "common/common.h"
 #include "common/encoder.h"
 #include "common/decoder.h"
+
 
 char* program_name = "standaard";
 

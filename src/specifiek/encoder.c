@@ -77,6 +77,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
             graceful_exit_printf(args,
                                  "Character '%c' was unexpected, I only accept JSON positive integer arrays.\n",
                                  last_read);
+
             // The max value is 2^63, which has 19 digits
         } else if((next_integer.length/8) > MAX_NUMBER_LENGTH){
             bitcode_free(&next_integer);
@@ -168,7 +169,7 @@ void encode(arguments* args){
         printf("%lu%%\n", ftell(args->source)*100/input_file_size);
 
         // Read the numbers in the input file
-         read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
+        read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
 
         // Calculate the difference between integers
         diff_encode(buffer2, buffer1, a_integers, args);
