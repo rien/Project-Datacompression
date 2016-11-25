@@ -52,8 +52,6 @@ void decode(arguments *args){
     while (true){
         current_block++;
 
-
-        bytes_read = (size_t)ftell(args->source);
         if(bytes_read == input_file_size){
             break;
         } else {
@@ -97,8 +95,9 @@ void decode(arguments *args){
         write_numbers(buffer1, a_integers, buffer2, &a_decoded);
 
         // Last ',' must be a closing bracket
-        if(ftell(args->source) == input_file_size){
-            buffer1[a_decoded-1] = ']';
+        bytes_read = (size_t)ftell(args->source);
+        if(bytes_read == input_file_size){
+            buffer2[a_decoded-1] = ']';
         }
 
         // Write decoded data

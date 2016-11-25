@@ -69,7 +69,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
         // Closing bracket: we reached the end of the file, ignore the rest
         if(last_read == ']'){
             *end_reached = true;
-            printf("Reached ending ']', finishing...");
+            printf("Reached ending ']', finishing...\n");
 
             // We did not encounter a digit
         } else if(next_integer.length == 0) {
@@ -88,7 +88,7 @@ void read_numbers(byte *input, size_t input_size, byte *output, size_t *a_intege
             bitcode_free(&next_integer);
             graceful_exit_printf(args,
                                  "A number was followed by the character '%c'. "
-                                         "Numbers should be delimited by commas (,).",
+                                         "Numbers should be delimited by commas (,).\n",
                                  last_read);
         } else {
             // continue
@@ -155,8 +155,6 @@ void encode(arguments* args){
     size_t a_bytes;                                             // amount of bytes used by the variable length integers
     size_t a_integers;                                          // amount of integers to be encoded
     size_t input_file_size = file_size(args->source);            // file size of the source
-    size_t blocks = CEIL_DIVISION(input_file_size, args->block_size);  // blocks to process
-    size_t current_block = 0;
 
     fread(buffer1, sizeof(byte), 1, args->source);
     if(buffer1[0] != '['){
@@ -165,10 +163,9 @@ void encode(arguments* args){
     bool end_reached = false;
 
     while((a_read = fread(buffer1, sizeof(byte), args->block_size, args->source)) > 0 && !end_reached){
-        current_block++;
 
-        // Show progress, not 100% correct because read_numbers sometimes reads a little bit more
-        printf("%lu%% - %lu/%lu\r\n",(current_block*100)/blocks, current_block, blocks);
+        // Show progress
+        printf("%lu%%\n", ftell(args->source)*100/input_file_size);
 
         // Read the numbers in the input file
          read_numbers(buffer1, a_read, buffer2, &a_integers, args, &end_reached);
