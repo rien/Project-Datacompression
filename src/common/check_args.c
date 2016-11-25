@@ -23,6 +23,8 @@ void parse_arguments(arguments* args, int argc, char **argv) {
 
     //args->bw_transform = true;
     //args->block_size   = (args->bw_transform ? (uint16_t) 8192 : (uint16_t) 32767);
+    args->source = NULL;
+    args->destination = NULL;
     args->block_size = (uint16_t) 32767;
 
     // first argument is the name of the executable
