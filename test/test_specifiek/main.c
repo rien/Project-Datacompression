@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/6/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include "../test_common/testmacro.h"
 #include "../test_common/common_tests.h"

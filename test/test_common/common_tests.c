@@ -1,6 +1,11 @@
-//
-// Created by rien on 11/22/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include "common_tests.h"
 #include "test_bitcode.h"

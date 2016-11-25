@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/11/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <memory.h>
 #include <time.h>
@@ -10,7 +15,6 @@
 #include "../common/common.h"
 #include "../common/huffman.h"
 #include "../common/file_info.h"
-#include "../common/check_args.h"
 
 /**
  * Encode a file with the standard compression algorithm (using huffman).

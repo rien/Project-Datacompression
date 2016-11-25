@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/23/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <collection_tools.h>
 #include "test_huffman.h"

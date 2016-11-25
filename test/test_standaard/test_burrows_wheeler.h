@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/12/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #ifndef DA3_PROJECT_TEST_BURROWS_WHEELER_H
 #define DA3_PROJECT_TEST_BURROWS_WHEELER_H

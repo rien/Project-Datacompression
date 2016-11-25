@@ -1,6 +1,11 @@
-//
-// Created by rien on 11/24/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <stdint.h>
 #include <stddef.h>

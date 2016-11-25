@@ -1,10 +1,14 @@
-//
-// Created by rien on 10/28/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <time.h>
 #include <memory.h>
-#include <assert.h>
 #include "../common/decoder.h"
 #include "../common/common.h"
 #include "../common/file_info.h"

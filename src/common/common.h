@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/11/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #ifndef DA3_PROJECT_CONSTANST_H
 #define DA3_PROJECT_CONSTANST_H

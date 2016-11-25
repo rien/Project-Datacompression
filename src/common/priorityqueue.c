@@ -1,6 +1,11 @@
-//
-// Created by rien on 10/19/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <malloc.h>
 #include <stdlib.h>

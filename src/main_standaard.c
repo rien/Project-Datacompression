@@ -1,4 +1,11 @@
-
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include "common/check_args.h"
 #include "common/encoder.h"

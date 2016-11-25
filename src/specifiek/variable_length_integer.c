@@ -1,6 +1,11 @@
-//
-// Created by rien on 11/23/16.
-//
+/*
+ * Author:
+ * Rien Maertens
+ * Rien.Maertens@UGent.be
+ * 3de Bachelor Informatica
+ * UGent
+ *
+ */
 
 #include <assert.h>
 #include "variable_length_integer.h"
