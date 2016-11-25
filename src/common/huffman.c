@@ -5,6 +5,7 @@
 #include <assert.h>
 #include "huffman.h"
 #include "priorityqueue.h"
+#include "bitcode.h"
 
 
 void huffman_tree_free(huffman_node *root) {

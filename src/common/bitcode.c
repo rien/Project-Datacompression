@@ -161,6 +161,10 @@ void bitcode_append(const bitcode *src, bitcode *dest) {
 
     dest->array[current_byte_dest] |= (src->array[current_byte_src] << shift_left);
     current_byte_dest++;
+
+    // Bugfix
+    dest->array[current_byte_dest] = 0;
+
     bits_copied += MIN(shift_right,src->length);
     while(bits_copied + 8 <= to_copy){
         dest->array[current_byte_dest] |= src->array[current_byte_src] >> shift_right;
@@ -168,6 +172,10 @@ void bitcode_append(const bitcode *src, bitcode *dest) {
 
         dest->array[current_byte_dest] |= src->array[current_byte_src] << shift_left;
         current_byte_dest++;
+
+        // Bugfix
+        dest->array[current_byte_dest] = 0;
+
         bits_copied += 8;
     }
     if(bits_copied != src->length){

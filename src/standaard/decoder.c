@@ -89,6 +89,7 @@ void decode(arguments* args) {
 
         // Write decoded data
         fwrite(buffer2, sizeof(byte), a_decoded, args->destination);
+
     }
 
     // Error handling
