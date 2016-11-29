@@ -9,7 +9,9 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "file_info.h"
+#include "check_args.h"
 
 /**
  * The current position in a file.
@@ -89,12 +91,13 @@ void print_progress(unsigned long long int src_pos, unsigned long long int src_s
 /**
  * Print statistics of the current compression/decompression operation
  */
-void print_stats(unsigned long long int src_size, unsigned long long int dest_size, double time, bool compression) {
+void print_stats(unsigned long long int src_size, unsigned long long int dest_size, arguments *args, double time,
+                 bool compression) {
     char* human_readable_src = human_readable_size(src_size);
     char* human_readable_dest = human_readable_size(dest_size);
-    char* human_readable_speed = human_readable_size((size_t)(src_size/time));
-
-
+    unsigned long long refsize = compression ? src_size : dest_size;
+    char* human_readable_speed = human_readable_size((size_t)(refsize/time));
+    printf("Blocksize used: %i\n", args->block_size);
     printf("Done: %s => %s\n", human_readable_src, human_readable_dest);
     printf("%.2f%% %s in %.2f seconds, %s/s written.\n",
            ((double)dest_size*100)/(double)src_size,
@@ -102,6 +105,27 @@ void print_stats(unsigned long long int src_size, unsigned long long int dest_si
             time,
             human_readable_speed);
     printf("Ratio: %.2f\n", (double)src_size/(double)dest_size);
+
+    if(args->benchmark_file){
+        FILE* benchmark;
+        if(access(args->benchmark_file, F_OK) == -1){
+            // File did not exist
+            benchmark = fopen(args->benchmark_file, "w");
+            fprintf(benchmark,"program, blocksize, inputsize, outputsize, speed, time\n");
+        } else {
+            // File exists
+            benchmark = fopen(args->benchmark_file, "a");
+        }
+        fprintf(benchmark,"%s %s,%i,%llu,%llu,%llu,%.3f\n",
+                program_name,
+                compression ? "compression" : "decompression",
+                args->block_size,
+                src_size,
+                dest_size,
+                (unsigned long long)(refsize/time),
+                time);
+        fclose(benchmark);
+    }
 
     free(human_readable_speed);
     free(human_readable_src);

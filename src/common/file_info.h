@@ -24,7 +24,8 @@ char* human_readable_size(size_t size);
 
 void print_progress(unsigned long long int src_pos, unsigned long long int src_size, clock_t start_time, bool compression);
 
-void print_stats(unsigned long long src_size, unsigned long long dest_size, double time, bool compression);
+void print_stats(unsigned long long int src_size, unsigned long long int dest_size, arguments *args, double time,
+                 bool compression);
 
 
 #endif //DA3_PROJECT_FILE_INFO_H

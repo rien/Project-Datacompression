@@ -9,8 +9,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include "check_args.h"
+#include "common.h"
 
 /**
  * Exit the program prematurely, but close open files.
@@ -55,6 +57,20 @@ void parse_arguments(arguments* args, int argc, char **argv) {
     args->source = NULL;
     args->destination = NULL;
     args->block_size = (uint16_t) 32767;
+
+    args->benchmark_file = getenv("BENCHMARKFILE");
+    const char* block_size_env = getenv("BLOCKSIZE");
+
+    if(block_size_env){
+        unsigned long block_size = strtoul(block_size_env, NULL, 10);
+        if(block_size > MAX_BLOCK_SIZE){
+            graceful_exit_printf(args, true, "Block size too big!");
+        }
+        args->block_size = (uint16_t) block_size;
+    }
+
+
+    printf("Using block size: %i\n bytes", args->block_size);
 
     // first argument is the name of the executable
     if(argc != (ARG_COUNT + 1)) {

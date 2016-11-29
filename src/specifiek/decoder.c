@@ -132,5 +132,5 @@ void decode(arguments *args){
     // Show off how good we are
     clock_t stop_time = clock();
     unsigned long long output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
+    print_stats(input_file_size, output_file_size, args, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
 }

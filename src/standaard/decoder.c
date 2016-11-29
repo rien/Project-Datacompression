@@ -13,6 +13,7 @@
 #include "../common/common.h"
 #include "../common/file_info.h"
 #include "../common/huffman.h"
+#include "../common/check_args.h"
 
 /**
  * Decode a file which was encoded with the standard algorithm.
@@ -110,6 +111,6 @@ void decode(arguments* args) {
     // Show off how good we are
     clock_t stop_time = clock();
     size_t output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
+    print_stats(input_file_size, output_file_size, args, (double) (stop_time - start_time) / CLOCKS_PER_SEC, false);
 
 }

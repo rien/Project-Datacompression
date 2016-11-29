@@ -222,5 +222,5 @@ void encode(arguments* args){
     // Show stats
     clock_t stop_time = clock();
     unsigned long long output_file_size = file_size(args->destination);
-    print_stats(input_file_size, output_file_size, (double) (stop_time - start_time) / CLOCKS_PER_SEC, true);
+    print_stats(input_file_size, output_file_size, args, (double) (stop_time - start_time) / CLOCKS_PER_SEC, true);
 }

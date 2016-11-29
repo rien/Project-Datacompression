@@ -28,6 +28,7 @@ typedef struct {
     FILE* destination;
     option_type option;
     uint16_t block_size;
+    const char* benchmark_file;
 } arguments;
 
 void graceful_exit_printf(arguments* args, bool usage_needed, const char *msg,...);
