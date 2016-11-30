@@ -75,12 +75,18 @@ De volgende implementatiedetails zijn het vermelden waard:
 
 Mijn specifiek compressie-algoritme past de volgende stappen na elkaar toe:
 
+Binaire voorstelling $\rightarrow$ Delta encoding $\rightarrow$ Variable-length integers
+
 \subsubsection{Omzetten naar binaire voorstelling}
 Als eerste stap worden de getallen in de inputfile omgezet van ASCII-waardes naar hun binaire voorstelling. Hierdoor moeten de kommas en haakjes niet meer opgeslagen worden. De grootste winst wordt echter geboekt bij het voorstellen van de getallen zelf: ze hebben nu altijd 8 bytes nodig, in plaats van gemiddeld 19 bytes (voor uniforme verdeling).
 \subsubsection{Delta encoding}
-Differential coding: het verschil met het vorige getal opslaan in plaats van het volledige getal.
+In plaats van de volledige getallen op te slaan, wordt het verschil met het vorige getal opgeslagen (of zelfs dit verschil $-1$ aangezien de getallenreeks strict stijgend is). Dit heeft als voordeel dat de getallen kleiner zijn, en dus beter kunnen gecomprimeerd worden bij de volgende stap.
 \subsubsection{Variable-length integers}
-Omzetten naar variable-length integers. Deze voorstelling begint met 3 bits die een getal $n$ tussen 1 en 8 voorstellen, gevolgd door $n$ bytes die de integer zelf voorstellen.
+De laatste stap is het omzetten naar integers met een variabele lengte. Deze voorstelling begint met 3 bits die een getal $n$ tussen 1 en 8 voorstellen (het getal 0 wordt niet geëncodeerd), gevolgd door de $n$ minst significante bytes van het geëncodeerde getal.
+
+Dit zorgt ervoor dat grote getallen in het slechtste geval een lengte krijgen van 67 bits. Maar aangezien we in de vorige stap enkel de verschillen tussen opeenvolgende getallen hebben opgeslagen, zullen de getallen gemiddeld veel kleiner zijn, waardoor een redelijk goede compressie wordt behaald.
+
+Uiteindelijk verkrijgen we een compressieratio van ongeveer $3,5$.
 
 \subsubsection{(Huffman)}
 Origineel werd na de laatste stap nog Huffman-encoding toegepast, maar later heb ik die weggehaald omdat geen significante compressiewinst meer werd verkregen.
@@ -88,6 +94,7 @@ Integendeel, sommige (grotere) bestanden werden minder goed gecomprimeerd hierdo
 
 \section{Vergelijking algoritmes}
 
+Zoals verwacht is het specifieke algoritme beter in het comprimeren van de gegeven bestanden. We kunnen namelijk een aantal assumpties maken die we bij het standaard algoritme niet kunnen (omdat we alle mogelijke inputbestanden moeten kunnen comprimeren).
 %TODO: best en worst-case
 
 \section{Versturen over internet}
