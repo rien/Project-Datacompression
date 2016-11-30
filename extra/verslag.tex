@@ -5,17 +5,19 @@
 \usepackage[dutch]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{pgfplots}
+\usepackage{enumitem}
 \usepackage{float}
 \usepackage{hyperref}
 \pgfplotsset{compat=newest}
 \setlength{\parindent}{1em}
 \setlength{\parskip}{1em}
+\interfootnotelinepenalty=10000
 \begin{document}
 \maketitle
 
-\part{Standaard algoritme}
+\section{Standaard algoritme}
 
-\section{Keuze van het algoritme}
+\subsection{Keuze van het algoritme}
 
 De keuze van het algoritme is vooral gebaseerd op redeneringswerk. We vatten de eigenschappen van de mogelijke compressie-algoritmen samen:
 \begin{description}
@@ -31,18 +33,18 @@ Ik heb niet gekozen voor de LZW of LZ77 omdat deze algoritmes langere codewoorde
 
 Naast Huffman heb ik ook Burrows-Wheeler in combinatie met move-to-front geïmplementeerd. Maar dit bleek achteraf geen goede keuze te zijn. De compressiewinst woog niet op tegen de extra rekentijd die nodig was om de transformatie te verwezenlijken. Daarnaast waren er ook wat problemen met het implementeren van de decompressie waardoor ik besloten heb de Burrows-Wheeler implementatie niet af te werken. De code en de tests zijn nog altijd terug te vinden in het project.
 
-\section{Implementatie}
+\subsection{Implementatie}
 
 Bij mijn compressieprogramma heb ik een module die zich enkel bezighoud met het bitgewijs lezen en schrijven van data: \texttt{bitcode.h} en \texttt{bitcode.c}. Deze maken het mogelijk om één enkele bit of byte te lezen of te schrijven en om een bitcode te concateneren aan de ander. Om dit zo efficient mogelijk te maken worden er zo weinig mogelijk bitoperaties gebruikt. Bijvoorbeeld: twee keer een OR-operatie om een niet-gealigneerde byte te schrijven in plaats van acht OR-operaties met de individuele bits. De gealloceerde array van data groeit ook exponentieel (zoals een arraylist zou doen) om toevoegen in constante tijd te laten doorgaan.
 
-\subsection{Huffman}
+\subsubsection{Huffman}
 
 Mijn implementatie van het Huffman-algoritme volgt grotendeels dat die in de cursus bescheven staat. Dit zijn nog enkele implementatiedetails die het vermelden waard zijn:
 
 De prioriteitswachtlijn die wordt gebruikt in mijn Huffman-implementatie is te vinden in \texttt{priorityqueue.c} en \texttt{priorityqueue.h}. De implementatie daarvan is redelijk naief: de items worden van groot naar klein gesorteerd, waardoor het kleinste element verwijderen in constante tijd gebeurt. Een nieuw element invoegen gebeurt door het item op het einde van de lijst toe te voegen en de hele lijst te sorteren. Aangezien de lijst een maximale grote heeft van 256 elementen (één per byte) en deze priorityqueue enkel wordt gebruikt bij het opbouwen van de Huffman-boom loont het niet de moeite om dit te optimaliseren.
 
-De Huffman-boom opslaan is misschien ook iets wat meer uitleg vraagt. Ik schrijf de boom als volgt uit\footnote{Het idee van dit formaat komt van het volgende StackOverflow-antwoord: \url{http://stackoverflow.com/a/759766/4424838}}: we overlopen de boom in pre-orde en bij iedere top schrijven we uit:
-\begin{itemize}
+Het opslaan van de Huffman-boom zelf gebeurt als volgt\footnote{Het idee van dit formaat komt van het volgende StackOverflow-antwoord: \url{http://stackoverflow.com/a/759766/4424838}}: we overlopen de boom in pre-orde en bij iedere top schrijven we uit:
+\begin{itemize}[topsep=0pt]
     \item De bit \texttt{0} wanneer we een inwendige top hebben.
     \item De bit \texttt{1} wanneer we een blad hebben, gevolgd door het karakter dat door die top wordt voorgesteld.
 \end{itemize}
@@ -50,32 +52,42 @@ Op die manier kan er op een recursieve manier door de boom gelopen worden om ze 
 
 % TODO: meer  ontwerpsbeslissingen
 
-\subsection{Burrows-Wheeler}
+\subsubsection{Burrows-Wheeler}
 
 Na het implementeren van Burrows-Wheeler was het snel duidelijk dat dit algoritme niet voldeed aan mijn verwachtingen: de compressiewinst was te klein en het snelheidsverlies te significant. Dit is ook logisch, de Burrows-Wheeler transformatie is pas efficient wanneer de tekst vaak voorkomende opeenvolgingen van karakters heeft. Wat niet het geval is in onze testdata. Omdat ik besloten heb de Burrows-Wheeler implementatie niet af te werken heb ik hier helaas geen testresultaten van.
 
-Er zijn misschien wel enkele implementatiedetails die het vermelden waard zijn:
+De volgende implementatiedetails zijn het vermelden waard:
 \begin{itemize}
     \item Bij de encodering wordt er gebruikt gemaakt van circulaire strings (\texttt{circular\_string.c}) die een pointer bevatten naar de originele string en een offset die hun rotatie aangeeft. Dit maakt het sorteren en roteren efficiënter.
     \item Het sorteren van de strings gebeurt momenteel met \texttt{qsort}, wat hoogstwaarschijnlijk de grootste bottleneck was. Omdat er gebruik wordt gemaakt van functiepointers is het moeilijker om daar te optimaliseren. Handmatig het sorteeralgoritme schrijven zou waarschijnlijk een significate performantiewinst als resultaat hebben.
     \item De index van het originele eerste karakter in de string wordt niet meegecodeerd met huffman, maar op voorhand uitgeschreven.
-    \item Bij het decoderen wordt er gewerkt met pointers naar karakters die worden gesorteerd. Aan de hand van die pointers en het laastst gedecodeerde karakter wordt de positie van het volgende karakter achterhaald.
+    \item Bij het decoderen wordt er gewerkt met pointers naar karakters die worden gesorteerd. Aan de hand van die pointers en het laastst gedecodeerde karakter wordt de positie van het volgende karakter bepaald.
 \end{itemize}
 
 % TODO: resultaten
 
 
 
-\part{Specifiek algortime}
+\section{Specifiek algortime}
 
-%TODO: bespreken algoritme
-%TODO: waarom?
+\subsection{Algoritme}
+Door het specifieke compressieprogramma worden de volgende stappen doorlopen:
+\subsubsection{Omzetten naar binaire voorstelling}
+Als eerste stap worden de getallen in de inputfile omgezet van ASCII-waardes naar hun binaire voorstelling. Hierdoor moeten de kommas en haakjes niet meer opgeslagen worden en zijn de getallen zelf ook (meestal) compacter voorgesteld.
+\subsubsection{Delta encoding}
+Differential coding: het verschil met het vorige getal opslaan in plaats van het volledige getal.
+\subsubsection{Variable-length integers}
+Omzetten naar variable-length integers. Deze voorstelling begint met 3 bits die een getal $n$ tussen 1 en 8 voorstellen, gevolgd door $n$ bytes die de integer zelf voorstellen.
 
-\part{Vergelijking algoritmes}
+\subsubsection{(Huffman)}
+Origineel werd na de laatste stap nog Huffman-encoding toegepast, maar later heb ik die weggehaald omdat geen significante compressiewinst meer werd verkregen.
+Integendeel, sommige (grotere) bestanden werden minder goed gecomprimeerd hierdoor.
+
+\section{Vergelijking algoritmes}
 
 %TODO: best en worst-case
 
-\part{Versturen over internet}
+\section{Versturen over internet}
 
 %TODO: bespreken
 

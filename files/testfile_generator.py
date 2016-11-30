@@ -29,22 +29,22 @@ def random_sum(k, v, file):
     file.write('[')
     for i in range(v):
         last += random.randint(0, 2**32-1)
-        file.write(str(random))
+        file.write(str(last))
         if i != v-1:
             file.write(',')
     file.write(']')
 
     print("Done")
 
-sizes = {'1K'   : 1000,
-         '5K'   : 5000,
-         '10K'  : 10000,
-         '50K'  : 50000,
-         '100K' : 100000,
-         '500K' : 500000,
-         '1.000K'   : 1000000,
-         '5.000K'   : 5000000,
-         '10.000K'  : 10000000,
+sizes = {#'1K'   : 1000,
+         #'5K'   : 5000,
+         #'10K'  : 10000,
+         #'50K'  : 50000,
+         #'100K' : 100000,
+         #'500K' : 500000,
+         #'1.000K'   : 1000000,
+         #'5.000K'   : 5000000,
+         #'10.000K'  : 10000000,
          '50.000K'  : 50000000}
 
 for k, v in sizes.items():
@@ -52,7 +52,7 @@ for k, v in sizes.items():
     uni_file = open(k + '_uniform.json', 'w')
     uniform_random(k, v, uni_file)
 
-    randsum_file = open(k + '_randsum.json', 'w')
-    random_sum(k,v, randsum_file)
+    #randsum_file = open(k + '_randsum.json', 'w')
+    #random_sum(k,v, randsum_file)
 
 
