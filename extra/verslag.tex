@@ -104,11 +104,19 @@ Zoals verwacht is het specifieke algoritme beter in het comprimeren van de gegev
 \begin{figure}[H]
     \begin{tikzpicture}
         \begin{semilogxaxis}[
-                title=Compression speed,
+                title=Compressieverhouding,
                 width=\textwidth,
-                height=7cm,
+                height=13cm,
+                legend pos=north west
             ]
-            \addplot +[mark=*] table [x=inputsize,y=speed]{testresults/uniform_standaard_compression.csv};
+            \addlegendentry{Standaard, uniforme verdeling}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_standaard_compression.csv};
+            \addlegendentry{Standaard, willekeurige som}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/randsum_standaard_compression.csv};
+            \addlegendentry{Specifiek, uniforme verdeling}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_specifiek_compression.csv};
+            \addlegendentry{Specifiek, willekeurige som}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/randsum_specifiek_compression.csv};
         \end{semilogxaxis}
     \end{tikzpicture}
 \end{figure}
