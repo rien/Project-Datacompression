@@ -4,8 +4,6 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-bench_dir="extra/testresultaten/"
-
 testfiles=("1K"
            "5K"
            "10K"
@@ -23,15 +21,14 @@ blocksize=(1028 2048 3076 4096 6144 8192 12288 16384 24576 32768 49152)
 for file in ${testfiles[@]}
 do
     (
-    export BENCHMARKFILE=${bench_dir}'default_randsum.csv'
     export orig="files/${file}_randsum.json"
     export comp="compressed/${file}_randsum.json"
     export rest="decompressed/${file}_randsum.json"
-    BENCHMARKFILE=${bench_dir}standaard_compression_randsum.csv ./out/standaard -c $orig $comp
-    BENCHMARKFILE=${bench_dir}standaard_decompression_randsum.csv ./out/standaard -d $comp $rest
+    BENCHMARKFILE=extra/testresults/standaard_compression_randsum.csv ./out/standaard -c $orig $comp
+    BENCHMARKFILE=extra/testresults/standaard_decompression_randsum.csv ./out/standaard -d $comp $rest
     cmp --silent $orig $rest
-    BENCHMARKFILE=${bench_dir}specifiek_compression_randsum.csv ./out/specifiek -c $orig $comp
-    BENCHMARKFILE=${bench_dir}specifiek_decompression_randsum.csv ./out/specifiek -d $comp $rest
+    BENCHMARKFILE=extra/testresults/specifiek_compression_randsum.csv ./out/specifiek -c $orig $comp
+    BENCHMARKFILE=extra/testresults/specifiek_decompression_randsum.csv ./out/specifiek -d $comp $rest
     cmp --silent $orig $rest
     )
 done
@@ -43,11 +40,11 @@ do
     export orig="files/${file}_uniform.json"
     export comp="compressed/${file}_uniform.json"
     export rest="decompressed/${file}_uniform.json"
-    BENCHMARKFILE=${bench_dir}standaard_compression_uniform.csv ./out/standaard -c $orig $comp
-    BENCHMARKFILE=${bench_dir}standaard_decompression_uniform.csv ./out/standaard -d $comp $rest
+    BENCHMARKFILE=extra/testresults/standaard_compression_uniform.csv ./out/standaard -c $orig $comp
+    BENCHMARKFILE=extra/testresults/standaard_decompression_uniform.csv ./out/standaard -d $comp $rest
     cmp --silent $orig $rest
-    BENCHMARKFILE=${bench_dir}specifiek_compression_uniform.csv ./out/specifiek -c $orig $comp
-    BENCHMARKFILE=${bench_dir}specifiek_decompression_uniform.csv ./out/specifiek -d $comp $rest
+    BENCHMARKFILE=extra/testresults/specifiek_compression_uniform.csv ./out/specifiek -c $orig $comp
+    BENCHMARKFILE=extra/testresults/specifiek_decompression_uniform.csv ./out/specifiek -d $comp $rest
     cmp --silent $orig $rest
     )
 done
@@ -57,16 +54,15 @@ for bs in ${blocksize[@]}
 do
     (
     file="10.000K"
-    export BENCHMARKFILE=${bench_dir}'blocksize.csv'
     export BLOCKSIZE=$bs
     export orig="files/${file}_uniform.json"
     export comp="compressed/${file}_uniform.json"
     export rest="decompressed/${file}_uniform.json"
-    BENCHMARKFILE=${bench_dir}standaard_compression_blocksize.csv ./out/standaard -c $orig $comp
-    BENCHMARKFILE=${bench_dir}standaard_decompression_blocksize.csv ./out/standaard -d $comp $rest
+    BENCHMARKFILE=extra/testresults/standaard_compression_blocksize.csv ./out/standaard -c $orig $comp
+    BENCHMARKFILE=extra/testresults/standaard_decompression_blocksize.csv ./out/standaard -d $comp $rest
     cmp --silent $orig $rest
-    BENCHMARKFILE=${bench_dir}specifiek_compression_blocksize.csv ./out/specifiek -c $orig $comp
-    BENCHMARKFILE=${bench_dir}specifiek_decompression_blocksize.csv ./out/specifiek -d $comp $rest
+    BENCHMARKFILE=extra/testresults/specifiek_compression_blocksize.csv ./out/specifiek -c $orig $comp
+    BENCHMARKFILE=extra/testresults/specifiek_decompression_blocksize.csv ./out/specifiek -d $comp $rest
     cmp --silent $orig $rest
     )
 done
