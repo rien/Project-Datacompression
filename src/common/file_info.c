@@ -111,17 +111,18 @@ void print_stats(unsigned long long int src_size, unsigned long long int dest_si
         if(access(args->benchmark_file, F_OK) == -1){
             // File did not exist
             benchmark = fopen(args->benchmark_file, "w");
-            fprintf(benchmark,"program blocksize inputsize outputsize speed time\n");
+            fprintf(benchmark,"program blocksize inputsize outputsize ratio speed time\n");
         } else {
             // File exists
             benchmark = fopen(args->benchmark_file, "a");
         }
-        fprintf(benchmark,"%s_%s %i %llu %llu %llu %.5f\n",
+        fprintf(benchmark,"%s_%s %i %llu %llu %.3f %llu %.5f\n",
                 program_name,
                 compression ? "compression" : "decompression",
                 args->block_size,
                 src_size,
                 dest_size,
+                (double)src_size/(double)dest_size,
                 (unsigned long long)(refsize/time),
                 time);
         fclose(benchmark);

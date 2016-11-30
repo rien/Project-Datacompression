@@ -72,9 +72,11 @@ De volgende implementatiedetails zijn het vermelden waard:
 \section{Specifiek algortime}
 
 \subsection{Algoritme}
-Door het specifieke compressieprogramma worden de volgende stappen doorlopen:
+
+Mijn specifiek compressie-algoritme past de volgende stappen na elkaar toe:
+
 \subsubsection{Omzetten naar binaire voorstelling}
-Als eerste stap worden de getallen in de inputfile omgezet van ASCII-waardes naar hun binaire voorstelling. Hierdoor moeten de kommas en haakjes niet meer opgeslagen worden. Daarnaast zijn de getallen meestal ook compacter voorgesteld: ze hebben nu altijd 8 bytes nodig, in plaats van gemiddeld 
+Als eerste stap worden de getallen in de inputfile omgezet van ASCII-waardes naar hun binaire voorstelling. Hierdoor moeten de kommas en haakjes niet meer opgeslagen worden. De grootste winst wordt echter geboekt bij het voorstellen van de getallen zelf: ze hebben nu altijd 8 bytes nodig, in plaats van gemiddeld 19 bytes (voor uniforme verdeling).
 \subsubsection{Delta encoding}
 Differential coding: het verschil met het vorige getal opslaan in plaats van het volledige getal.
 \subsubsection{Variable-length integers}
