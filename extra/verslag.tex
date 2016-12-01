@@ -28,7 +28,7 @@ De keuze van het algoritme is vooral gebaseerd op redeneringswerk. We vatten de 
     \item [Burrows-Wheeler] Dit algoritme maakt een tekst niet kleiner. Het is een transformatie die het gemakkelijker maakt om bestanden beter te comprimeren. Na deze transformatie wordt vaak move-to-front toegepast en vervolgens huffman encoding. Dit heeft enkel echter een invloed wanneer vaak dezelfde opeenvolging van karakters in de data zitten.
 \end{description}
 
-Huffman encoding leek mij de beste manier om de gegeven data te comprimeren. De gegeven data heeft maar een alfabet van dertien karakters: de tien cijfers, de komma, en de twee vierkante haakjes. Deze worden door huffman omgezet naar codewoorden van drie tot vier karakters. Hierdoor verwachten we minstens een halvering van de originele bestandsgrootte.
+Huffman encoding leek mij de beste manier om de gegeven data te comprimeren. De gegeven data heeft maar een alfabet van dertien karakters: de tien cijfers, de komma, en de twee vierkante haakjes. De cijfers, die het vaakst voorkomen, worden door huffman omgezet naar codewoorden van drie tot vier bits. Hierdoor verwachten we minstens een halvering van de originele bestandsgrootte.
 
 Ik heb niet gekozen voor de LZW of LZ77 omdat deze algoritmes langere codewoorden nodig hebben voor opeenvolgende karakters zonder structuur (zoals de minst significate cijfers van een groot getal). Terwijl dat Huffman voor ieder karakter in ons alfabet een kortere code gebruikt.
 
@@ -50,6 +50,8 @@ Het opslaan van de Huffman-boom zelf gebeurt als volgt\footnote{Het idee van dit
     \item De bit \texttt{1} wanneer we een blad hebben, gevolgd door het karakter dat door die top wordt voorgesteld.
 \end{itemize}
 Op die manier kan er op een recursieve manier door de boom gelopen worden om ze op te slaan en kan ze ook recursief ingelezen worden, terwijl het codewoord voor ieder karakter wordt ingesteld (met de methodes \texttt{huffman\_build\_dictionary()} en \texttt{huffman\_reconstruct\_tree()} in \texttt{huffman.c}).
+
+Uiteindelijk is er een compressieratio van $2,3$ bereikt.
 
 % TODO: meer  ontwerpsbeslissingen
 
@@ -95,30 +97,80 @@ Integendeel, sommige (grotere) bestanden werden minder goed gecomprimeerd hierdo
 \section{Vergelijking algoritmes}
 
 Zoals verwacht is het specifieke algoritme beter in het comprimeren van de gegeven bestanden. We kunnen namelijk een aantal assumpties maken die we bij het standaard algoritme niet kunnen (omdat we alle mogelijke inputbestanden moeten kunnen comprimeren).
-%TODO: best en worst-case
 
-\section{Versturen over internet}
+\subsection{Best- en worst-case gevallen}
+\subsubsection{Standaard}
+Het worst-case scenario bij Huffman-encodering doet zich voor wanneer het aantal voorkomens van de symbolen voldoet aan de fibonacci-reeks. Deze resulteerd in een volledig ongebalanceerde Huffman-boom die de data encodeerd met meer bits dan in het originele bestand. De restrictie die onze data oplegt maakt het echter moeilijk om hieraan te voldoen. In de praktijk is de kans dat dit voorkomt zo goed als 0.
 
-%TODO: bespreken
+In het beste geval zijn er nog een aantal symbolen die ontbreken in de gegeven data. In dat geval zijn er nog minder bits nodig om de resterende symbolen voor te stellen. Natuurlijk is ook dit een geval dat in de praktijk niet zal voorkomen.
+
+\subsubsection{Specifiek}
+Het worst-case scenario van het specifieke algoritme, is wanneer er een zo gelijke, zo groot mogelijke afstand tussen elk opeenvogend paar getallen zit. Door de delta-encoding en de variabele lengte van de integers zal het verschil dan meer bits nodig hebben om opgeslagen te kunnen worden. De stijgende aard van de getallen en de bovengrens zorgen er echter voor dat dit niet uit de hand kan lopen: als de afstand zo groot mogelijk moet zijn, dan zit ieder getal gelijk verdeeld over het totale bereik. Maar hoe meer getallen er gecodeerd worden (en dus hoe groter het bestand), hoe minder ruimte er kan zijn tussen opeenvolgende getallen. Dit verklaart waarom een stijging in bestandsgrootte ook een stijging in de compressieratio als gevolg heeft.
+
+Het beste geval doet zich dan weer voor wanneer er tussen ieder getal een zo klein mogelijk verschil is. Wanneer het verschil tussen twee getallen kleiner is dan 256 hebben we maar 11 bits nodig om it voor te stellen (de 3 bits die aanduiden hoeveel bytes er nodig zijn + de minst significante byte van het verschil). Als dus uitgaan van een gemiddelde lengte van 19 karakters per getal (in uniforme verdeling) dan bereiken we een compressieratio van $(19\cdot8)/11 \approx 13,8$.
 
 \begin{figure}[H]
+    \centering
     \begin{tikzpicture}
         \begin{semilogxaxis}[
                 title=Compressieverhouding,
                 width=\textwidth,
-                height=13cm,
+                height=10cm,
+                legend pos=north west
+            ]
+            \addlegendentry{Standaard, uniforme verdeling}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_standaard_compression.csv};
+            \addlegendentry{Standaard, willekeurige som}
+            \addplot +[mark=*,] table [x=inputsize,y=ratio]{testresults/randsum_standaard_compression.csv};
+            \addlegendentry{Specifiek, uniforme verdeling}
+            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_specifiek_compression.csv};
+            \addlegendentry{Specifiek, willekeurige som}
+            \addplot +[mark=*,] table [x=inputsize,y=ratio]{testresults/randsum_specifiek_compression.csv};
+        \end{semilogxaxis}
+    \end{tikzpicture}
+    \begin{tikzpicture}
+        \begin{semilogxaxis}[
+                title=Compressieverhouding standaard algoritme,
+                width=\textwidth,
+                height=7cm,
                 legend pos=north west
             ]
             \addlegendentry{Standaard, uniforme verdeling}
             \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_standaard_compression.csv};
             \addlegendentry{Standaard, willekeurige som}
             \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/randsum_standaard_compression.csv};
-            \addlegendentry{Specifiek, uniforme verdeling}
-            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/uniform_specifiek_compression.csv};
-            \addlegendentry{Specifiek, willekeurige som}
-            \addplot +[mark=*] table [x=inputsize,y=ratio]{testresults/randsum_specifiek_compression.csv};
         \end{semilogxaxis}
     \end{tikzpicture}
+\caption{Vergelijking van de compressieratio van de twee compressiealgoritmen. Met het verschil tussen de uniforme verdeling en willekeurige som van het standaard algoritme uitvergroot.}
 \end{figure}
+\section{Versturen over internet}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{semilogxaxis}[
+                title=Encodering en decoderingssnelheid,
+                width=\textwidth,
+                height=10cm,
+                legend pos=south east
+            ]
+            \addlegendentry{Standaard, compressie}
+            \addplot +[mark=*] table [x=inputsize,y=speed]{testresults/uniform_standaard_compression.csv};
+            \addlegendentry{Standaard, decompressie}
+            \addplot +[mark=*] table [x=outputsize,y=speed]{testresults/uniform_standaard_decompression.csv};
+            \addlegendentry{Specifiek, compressie}
+            \addplot +[mark=*] table [x=inputsize,y=speed]{testresults/uniform_specifiek_compression.csv};
+            \addlegendentry{Specifiek, decompressie}
+            \addplot +[mark=*] table [x=outputsize,y=speed]{testresults/uniform_specifiek_decompression.csv};
+        \end{semilogxaxis}
+    \end{tikzpicture}
+\caption{De encodering en decoderingssnelheid van de algoritmes. Dit wordt berkend door de grootte van het originele bestand te delen door de tijd die nodig was om het bestand te comprimeren.}
+\end{figure}
+%TODO: bespreken
+%TODO: grafieken benoemen!
+
+
+Door een bestand te comprimeren voor we ze over het internet versturen kunnen we onze data vlugger doorsturen. Onze data zit namelijk compacter verpakt, en aan eenzelfde transmissiesnelheid wordt er meer informatie verstuurd. Wanneer we bijvoorbeeld een bestand van 100 Mebibyte kunnen versturen aan 10 MiB/s zal dit oorspronkelijk ongeveer 10 seconden duren. Comprimeren we dit echter met een compressieratio van 2, dan zal dit maar 5 seconden duren. De nieuwe snelheid kunnen we berekenen aan de hand van de volgende formule:
+$$ datasnelheid = \frac{transmissiesnelheid}{compressieratio} $$
 
 \end{document}

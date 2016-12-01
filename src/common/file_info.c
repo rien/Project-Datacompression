@@ -116,14 +116,14 @@ void print_stats(unsigned long long int src_size, unsigned long long int dest_si
             // File exists
             benchmark = fopen(args->benchmark_file, "a");
         }
-        fprintf(benchmark,"%s_%s %i %llu %llu %.3f %llu %.5f\n",
+        fprintf(benchmark,"%s_%s %i %llu %llu %.3f %.3f %.5f\n",
                 program_name,
                 compression ? "compression" : "decompression",
                 args->block_size,
                 src_size,
                 dest_size,
                 (double)src_size/(double)dest_size,
-                (unsigned long long)(refsize/time),
+                ((double)refsize/time)/1048576.0, // speed in MiB
                 time);
         fclose(benchmark);
     }
