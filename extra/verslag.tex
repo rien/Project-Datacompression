@@ -35,7 +35,7 @@ Ik heb niet gekozen voor de LZW of LZ77 omdat deze algoritmes langere codewoorde
 Naast Huffman heb ik ook Burrows-Wheeler in combinatie met move-to-front geïmplementeerd. Maar dit bleek achteraf geen goede keuze te zijn. De compressiewinst woog niet op tegen de extra rekentijd die nodig was om de transformatie te verwezenlijken. Daarnaast waren er ook wat problemen met het implementeren van de decompressie waardoor ik besloten heb de Burrows-Wheeler implementatie niet af te werken. De code en de tests zijn nog altijd terug te vinden in het project.
 
 \subsection{Implementatie}
-
+%TODO: blokgrootte
 Bij mijn compressieprogramma heb ik een module die zich enkel bezighoud met het bitgewijs lezen en schrijven van data: \texttt{bitcode.h} en \texttt{bitcode.c}. Deze maken het mogelijk om één enkele bit of byte te lezen of te schrijven en om een bitcode te concateneren aan de ander. Om dit zo efficient mogelijk te maken worden er zo weinig mogelijk bitoperaties gebruikt. Bijvoorbeeld: twee keer een OR-operatie om een niet-gealigneerde byte te schrijven in plaats van acht OR-operaties met de individuele bits. De gealloceerde array van data groeit ook exponentieel (zoals een arraylist zou doen) om toevoegen in constante tijd te laten doorgaan.
 
 \subsubsection{Huffman}
@@ -152,6 +152,7 @@ Het beste geval doet zich dan weer voor wanneer er tussen ieder getal een zo kle
                 title=Encodering en decoderingssnelheid,
                 width=\textwidth,
                 height=10cm,
+                ylabel=Bitrate (MiB/s),
                 legend pos=south east
             ]
             \addlegendentry{Standaard, compressie}
@@ -171,6 +172,10 @@ Het beste geval doet zich dan weer voor wanneer er tussen ieder getal een zo kle
 
 
 Door een bestand te comprimeren voor we ze over het internet versturen kunnen we onze data vlugger doorsturen. Onze data zit namelijk compacter verpakt, en aan eenzelfde transmissiesnelheid wordt er meer informatie verstuurd. Wanneer we bijvoorbeeld een bestand van 100 Mebibyte kunnen versturen aan 10 MiB/s zal dit oorspronkelijk ongeveer 10 seconden duren. Comprimeren we dit echter met een compressieratio van 2, dan zal dit maar 5 seconden duren. De nieuwe snelheid kunnen we berekenen aan de hand van de volgende formule:
-$$ datasnelheid = \frac{transmissiesnelheid}{compressieratio} $$
+$$ datasnelheid = transmissiesnelheid\cdot compressieratio $$
+Om de data naar de ontvanger te sturen moet die eerst gecodeerd worden, doorgestuurt worden over het internet, en vervolgens gedecodeerd worden. Omdat één van die drie stappen de data slechts kan verwerken aan de snelheid die ze binnekrijgt of kan uitsturen, is de totale snelheid van deze ketting gelijk aan de traagste van deze drie stappen. Optimaal zou zijn wanneer alledrie de snelheden gelijk zijn, dan is $ compressiesnelheid = datasnelheid = decompressiesnelheid $.
 
+We nemen nu het slechte geval van onze metingen: daar was de decompressiesnelheid van het standaard algoritme gelijk aan 40 MiB/s. Nemen we nu een compressieratio van 2,3 dan hebben we een transmissieratio van minstens 17,4 MiB/s nodig om de data aan een optimale snelheid binnen te krijgen. De gemiddelde downloadsnelheid van een internetverbinding in Belgie ligt een pak lager dan dat. (Een speedtest op eduroam levert doorgaans een snelheid van 40Mib/s = 5 MiB/s)
+
+Pas wanneer de transmissiesnelheid hoger is dan de encoderings- of decoderingssnelheid loont het niet meer de moeite om de data te comprimeren. Met de huidige telecommunicatiemarkt zal dat niet het geval zijn.
 \end{document}
